@@ -4,6 +4,9 @@ compile_commands.json
 # Clang Cache
 .cache/
 
+# Build Dir
+build/
+
 # Bins
 bin/*
 
