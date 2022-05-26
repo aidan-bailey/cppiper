@@ -1,6 +1,9 @@
 # Compiler Commands
 compile_commands.json
 
+# Clang Cache
+.cache/
+
 # Bins
 bin/*
 
