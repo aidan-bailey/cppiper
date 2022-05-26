@@ -1,4 +1,4 @@
-#include "../include/sender.hh"
+#include "sender.hh"
 #include <algorithm>
 #include <fcntl.h>
 #include <filesystem>
@@ -15,9 +15,7 @@ const void cppiper::Sender::sender(std::string pipe_path, int &msg_size,
                                    char *&buffer, bool &success, char *&err_msg,
                                    bool &running, std::mutex &lock,
                                    std::barrier<> &barrier) {
-  std::cout << "Start" << std::endl;
   lock.lock();
-  std::cout << "Start2" << std::endl;
   int ret_code;
   if (not std::filesystem::exists(pipe_path)) {
     ret_code = mkfifo(pipe_path.c_str(), 00666);
@@ -41,23 +39,18 @@ const void cppiper::Sender::sender(std::string pipe_path, int &msg_size,
     lock.unlock();
     return;
   }
-  lock.unlock();
   std::stringstream ss;
+  lock.unlock();
   while (true) {
     std::cout << "Waiting" << std::endl;
     barrier.arrive_and_wait();
     lock.lock();
+    success = true;
     std::cout << "Done waiting" << std::endl;
     if (not running) {
       std::cout << "Not running so break" << std::endl;
       break;
     }
-    if (not success){
-      std::cout << "Not success so skip" << std::endl;
-      barrier.arrive_and_wait();
-      continue;
-    }
-    success = true;
     if (msg_size < 0) {
       success = false;
       if (err_msg != nullptr)
@@ -84,6 +77,8 @@ const void cppiper::Sender::sender(std::string pipe_path, int &msg_size,
     ret_code = write(pipe_fd, ss.str().c_str(), msg_size + 8);
     if (ret_code == -1) {
       success = false;
+      if (err_msg != nullptr)
+        delete[] err_msg;
       err_msg = (char *)"attempt to send empty message";
       lock.unlock();
       barrier.arrive_and_wait();
@@ -105,28 +100,34 @@ const void cppiper::Sender::sender(std::string pipe_path, int &msg_size,
   lock.unlock();
 }
 
-cppiper::Sender::~Sender(void) { terminate(); }
+cppiper::Sender::~Sender(void) {
+  terminate();
+  if (err_msg != nullptr)
+    delete[] err_msg;
+  if (buffer != nullptr)
+    delete[] buffer;
+}
 
 cppiper::Sender::Sender(std::string pipe_path)
-    : msg_size(0), pipe_path(pipe_path), success(true), err_msg(nullptr),
-      buffer(nullptr), running(true), lock(), barrier(2),
+    : msg_size(0), pipe_path(pipe_path), buffer(nullptr), err_msg(nullptr),
+      success(true), running(true), lock(), barrier(2),
       thread(sender, std::ref(pipe_path), std::ref(msg_size), std::ref(buffer),
              std::ref(success), std::ref(err_msg), std::ref(running),
              std::ref(lock), std::ref(barrier)) {}
 
 const std::string cppiper::Sender::get_err_msg(void) {
-    return err_msg == nullptr ? "" : err_msg; }
+  return err_msg == nullptr ? "" : err_msg;
+}
 
 const bool cppiper::Sender::send(char *msg, int size) {
   std::cout << "sending" << std::endl;
   if (not running)
     return false;
   lock.lock();
-  success = true;
   if (buffer != nullptr)
     delete[] buffer;
   msg_size = size;
-  buffer = new char[msg_size+1];
+  buffer = new char[msg_size + 1];
   for (auto i = 0; i < msg_size; i++)
     buffer[i] = msg[i];
   buffer[msg_size] = '\0';
@@ -135,9 +136,6 @@ const bool cppiper::Sender::send(char *msg, int size) {
   barrier.arrive_and_wait();
   lock.lock();
   msg_size = 0;
-  auto errmsg = get_err_msg();
-  if (not errmsg.empty())
-      std::cout << get_err_msg() << std::endl;
   lock.unlock();
   return success;
 }
@@ -150,9 +148,5 @@ const bool cppiper::Sender::terminate(void) {
   lock.unlock();
   barrier.arrive_and_wait();
   thread.join();
-  if (buffer != nullptr)
-    delete[] buffer;
-  if (err_msg != nullptr)
-    delete[] err_msg;
   return true;
 }
