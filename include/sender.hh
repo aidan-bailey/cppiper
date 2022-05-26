@@ -7,8 +7,6 @@
 
 namespace cppiper {
 
-
-
 class Sender {
 private:
   std::thread thread;
@@ -22,9 +20,8 @@ private:
   int msg_size;
 
   const static void sender(std::string pipe_path, int &msg_size, char *&buffer,
-                         bool &success, char *&err_msg, bool &running,
-                         std::mutex &lock, std::barrier<> &barrier
-                         );
+                           bool &success, char *&err_msg, bool &running,
+                           std::mutex &lock, std::barrier<> &barrier);
 
 public:
   Sender(void) = delete;
