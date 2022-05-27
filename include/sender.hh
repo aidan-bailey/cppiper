@@ -22,7 +22,7 @@ private:
   int statuscode;
 
   const static void sender(std::string &pipepath, std::vector<char> &buffer,
-                           int &statuscode, bool &msg_ready, bool &stop,
+                           int &statuscode, bool &msg_ready, const bool &stop,
                            std::mutex &lock,
                            std::condition_variable &msg_conditional,
                            std::barrier<> &processed_barrier);
