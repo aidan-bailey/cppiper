@@ -2,7 +2,12 @@
 #include <algorithm>
 #include <fcntl.h>
 #include <filesystem>
+#include <fstream>
+#include <functional>
 #include <iostream>
+#include <memory>
+#include <mutex>
+#include <ostream>
 #include <sstream>
 #include <stdexcept>
 #include <stdio.h>
@@ -10,143 +15,122 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <vector>
 
-const void cppiper::Sender::sender(std::string pipe_path, int &msg_size,
-                                   char *&buffer, bool &success, char *&err_msg,
-                                   bool &running, std::mutex &lock,
-                                   std::barrier<> &barrier) {
-  lock.lock();
-  int ret_code;
-  if (not std::filesystem::exists(pipe_path)) {
-    ret_code = mkfifo(pipe_path.c_str(), 00666);
-    if (ret_code == -1) {
-      success = false;
-      if (err_msg != nullptr)
-        delete[] err_msg;
-      err_msg = (char *)"failed to create sender pipe";
-      running = false;
-      lock.unlock();
+const void cppiper::Sender::sender(std::string &pipepath,
+                                   std::vector<char> &buffer, int &statuscode,
+                                   bool &msg_ready, bool &stop,
+                                   std::mutex &lock,
+                                   std::condition_variable &msg_conditional,
+                                   std::barrier<> &processed_barrier) {
+  std::unique_lock lk(lock);
+  std::cout << "LOCKING" << std::endl;
+  int retcode;
+  if (not std::filesystem::exists(pipepath)) {
+    retcode = mkfifo(pipepath.c_str(), 00666);
+    if (retcode == -1) {
+      std::cerr << "Failed to create sender pipe." << std::endl;
+      statuscode = 1;
+      lk.unlock();
       return;
     }
   }
-  int pipe_fd = open(pipe_path.c_str(), O_RDWR | O_APPEND);
-  if (pipe_fd == -1) {
-    success = false;
-    if (err_msg != nullptr)
-      delete[] err_msg;
-    err_msg = (char *)"failed to open sender pipe";
-    running = false;
-    lock.unlock();
+  std::cout << "STARTING TO READ" << std::endl;
+  std::ofstream pipe;
+  try {
+    pipe.open(pipepath, std::ofstream::out | std::ofstream::ate | std::ofstream::binary);
+  } catch (std::ofstream::failure e) {
+    std::cerr << "Failed to open sender pipe." << std::endl;
+    statuscode = 2;
+    lk.unlock();
     return;
   }
+  std::cout << "READING" << std::endl;
   std::stringstream ss;
-  lock.unlock();
+  std::cout << "START LOOP" << std::endl;
   while (true) {
-    std::cout << "Waiting" << std::endl;
-    barrier.arrive_and_wait();
-    lock.lock();
-    success = true;
-    std::cout << "Done waiting" << std::endl;
-    if (not running) {
-      std::cout << "Not running so break" << std::endl;
+    if (not (msg_ready or stop)) {
+      msg_conditional.wait(lk, [&]() { return msg_ready or stop; });
+    }
+    statuscode = 0;
+    if (stop) {
       break;
     }
-    if (msg_size < 0) {
-      success = false;
-      if (err_msg != nullptr)
-        delete[] err_msg;
-      err_msg = (char *)"message size is < 1";
-      lock.unlock();
-      barrier.arrive_and_wait();
+    if (buffer.empty()) {
+      std::cerr << "Attempt to send empty message." << std::endl;
+      statuscode = 3;
+      msg_ready = false;
+      lk.unlock();
+      msg_conditional.notify_one();
       continue;
     }
-    std::cout << "Message size: " << msg_size << std::endl;
-    if (buffer == nullptr) {
-      success = false;
-      if (err_msg != nullptr)
-        delete[] err_msg;
-      err_msg = (char *)"attempt to send empty message";
-      lock.unlock();
-      barrier.arrive_and_wait();
+    ss << std::setfill('0') << std::setw(8) << std::hex << buffer.size();
+    try {
+      pipe << ss.rdbuf();
+    } catch (std::ofstream::failure e) {
+      std::cerr << "Failed to send message size." << std::endl;
+      statuscode = 4;
+      ss.flush();
+      msg_ready = false;
+      lk.unlock();
+      msg_conditional.notify_one();
       continue;
     }
-    std::cout << "Buffer: " << buffer << std::endl;
-    ss << std::setfill('0') << std::setw(8) << std::hex << msg_size;
-    ss << buffer;
-    std::cout << "Message: " << ss.rdbuf() << std::endl;
-    ret_code = write(pipe_fd, ss.str().c_str(), msg_size + 8);
-    if (ret_code == -1) {
-      success = false;
-      if (err_msg != nullptr)
-        delete[] err_msg;
-      err_msg = (char *)"attempt to send empty message";
-      lock.unlock();
-      barrier.arrive_and_wait();
-      continue;
-    }
-    std::cout << "Success: " << success << std::endl;
-    lock.unlock();
-    barrier.arrive_and_wait();
     ss.flush();
+    try {
+      std::for_each(buffer.begin(), buffer.end(),
+                    [&pipe](const char &s) { pipe << s; });
+    } catch (std::ofstream::failure e) {
+      std::cerr << "Failed to send message." << std::endl;
+      statuscode = 5;
+      msg_ready = false;
+      lk.unlock();
+      msg_conditional.notify_one();
+      continue;
+    }
   }
-  std::cout << "Ending thread" << std::endl;
-  ret_code = close(pipe_fd);
-  if (ret_code == -1) {
-    success = false;
-    if (err_msg != nullptr)
-      delete[] err_msg;
-    err_msg = (char *)"failed to close sender pipe";
-  }
-  lock.unlock();
+  pipe.flush();
+  pipe.close();
+  lk.unlock();
 }
 
-cppiper::Sender::~Sender(void) {
-  terminate();
-  if (err_msg != nullptr)
-    delete[] err_msg;
-  if (buffer != nullptr)
-    delete[] buffer;
-}
+cppiper::Sender::Sender(std::string pipepath)
+    : pipepath(pipepath), buffer(), statuscode(0), msg_ready(false),
+      stop(false), lock(), msg_conditional(), processed_barrier(2),
+      thread(sender, std::ref(pipepath), std::ref(buffer), std::ref(statuscode),
+             std::ref(msg_ready), std::ref(stop), std::ref(lock),
+             std::ref(msg_conditional), std::ref(processed_barrier)) {}
 
-cppiper::Sender::Sender(std::string pipe_path)
-    : msg_size(0), pipe_path(pipe_path), buffer(nullptr), err_msg(nullptr),
-      success(true), running(true), lock(), barrier(2),
-      thread(sender, std::ref(pipe_path), std::ref(msg_size), std::ref(buffer),
-             std::ref(success), std::ref(err_msg), std::ref(running),
-             std::ref(lock), std::ref(barrier)) {}
+cppiper::Sender::~Sender(void) { terminate(); }
 
-const std::string cppiper::Sender::get_err_msg(void) {
-  return err_msg == nullptr ? "" : err_msg;
-}
+const int cppiper::Sender::get_status_code(void) { return statuscode; };
 
-const bool cppiper::Sender::send(char *msg, int size) {
-  std::cout << "sending" << std::endl;
-  if (not running)
+const bool cppiper::Sender::send(const std::vector<char> &msg) {
+  if (not thread.joinable() or stop) {
+    std::cerr << "Attempt to send message with terminated sender." << std::endl;
     return false;
-  lock.lock();
-  if (buffer != nullptr)
-    delete[] buffer;
-  msg_size = size;
-  buffer = new char[msg_size + 1];
-  for (auto i = 0; i < msg_size; i++)
-    buffer[i] = msg[i];
-  buffer[msg_size] = '\0';
-  lock.unlock();
-  barrier.arrive_and_wait();
-  barrier.arrive_and_wait();
-  lock.lock();
-  msg_size = 0;
-  lock.unlock();
-  return success;
+  }
+  {
+    std::lock_guard lk(lock);
+    msg_ready = true;
+  }
+  msg_conditional.notify_one();
+  processed_barrier.arrive_and_wait();
+  return statuscode == 0;
 }
 
 const bool cppiper::Sender::terminate(void) {
-  if (not thread.joinable())
-    return false;
-  lock.lock();
-  running = false;
-  lock.unlock();
-  barrier.arrive_and_wait();
+  if (not thread.joinable() or stop) {
+    std::cerr << "Double termination for sender." << std::endl;
+    return true;
+  }
+  {
+    std::cout << "Waiting" << std::endl;
+    std::lock_guard lk(lock);
+    std::cout << "Locked" << std::endl;
+    stop = true;
+  }
+  msg_conditional.notify_one();
   thread.join();
   return true;
 }
