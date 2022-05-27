@@ -22,6 +22,7 @@ add_library(
   cppiper
   SHARED
   src/sender.cc
+  src/receiver.cc
   )
 
 set_target_properties(cppiper PROPERTIES LINKER_LANGUAGE CXX)
@@ -35,6 +36,7 @@ add_library(
   cppiper_static
   STATIC
   src/sender.cc
+  src/receiver.cc
   )
 
 set_target_properties(cppiper_static PROPERTIES LINKER_LANGUAGE CXX)
