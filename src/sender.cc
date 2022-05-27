@@ -19,12 +19,11 @@
 
 const void cppiper::Sender::sender(std::string &pipepath,
                                    std::vector<char> &buffer, int &statuscode,
-                                   bool &msg_ready, bool &stop,
+                                   bool &msg_ready, const bool &stop,
                                    std::mutex &lock,
                                    std::condition_variable &msg_conditional,
                                    std::barrier<> &processed_barrier) {
   std::unique_lock lk(lock);
-  std::cout << "LOCKING" << std::endl;
   int retcode;
   if (not std::filesystem::exists(pipepath)) {
     retcode = mkfifo(pipepath.c_str(), 00666);
@@ -35,7 +34,6 @@ const void cppiper::Sender::sender(std::string &pipepath,
       return;
     }
   }
-  std::cout << "STARTING TO READ" << std::endl;
   std::ofstream pipe;
   try {
     pipe.open(pipepath, std::ofstream::out | std::ofstream::ate | std::ofstream::binary);
@@ -45,9 +43,7 @@ const void cppiper::Sender::sender(std::string &pipepath,
     lk.unlock();
     return;
   }
-  std::cout << "READING" << std::endl;
   std::stringstream ss;
-  std::cout << "START LOOP" << std::endl;
   while (true) {
     if (not (msg_ready or stop)) {
       msg_conditional.wait(lk, [&]() { return msg_ready or stop; });
@@ -61,7 +57,7 @@ const void cppiper::Sender::sender(std::string &pipepath,
       statuscode = 3;
       msg_ready = false;
       lk.unlock();
-      msg_conditional.notify_one();
+      processed_barrier.arrive_and_wait();
       continue;
     }
     ss << std::setfill('0') << std::setw(8) << std::hex << buffer.size();
@@ -73,7 +69,7 @@ const void cppiper::Sender::sender(std::string &pipepath,
       ss.flush();
       msg_ready = false;
       lk.unlock();
-      msg_conditional.notify_one();
+      processed_barrier.arrive_and_wait();
       continue;
     }
     ss.flush();
@@ -85,9 +81,11 @@ const void cppiper::Sender::sender(std::string &pipepath,
       statuscode = 5;
       msg_ready = false;
       lk.unlock();
-      msg_conditional.notify_one();
+      processed_barrier.arrive_and_wait();
       continue;
     }
+    msg_ready = false;
+    processed_barrier.arrive_and_wait();
   }
   pipe.flush();
   pipe.close();
@@ -112,8 +110,10 @@ const bool cppiper::Sender::send(const std::vector<char> &msg) {
   }
   {
     std::lock_guard lk(lock);
+    buffer.clear();
     msg_ready = true;
   }
+  buffer = msg;
   msg_conditional.notify_one();
   processed_barrier.arrive_and_wait();
   return statuscode == 0;
@@ -125,9 +125,7 @@ const bool cppiper::Sender::terminate(void) {
     return true;
   }
   {
-    std::cout << "Waiting" << std::endl;
     std::lock_guard lk(lock);
-    std::cout << "Locked" << std::endl;
     stop = true;
   }
   msg_conditional.notify_one();
