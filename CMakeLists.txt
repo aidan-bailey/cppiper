@@ -12,11 +12,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if(GENCC)
-   set(CMAKE_EXPORT_COMPILE_COMMANDS True)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 endif()
 
 SET(GCC_COVERAGE_COMPILE_FLAGS "-I/usr/lib/gcc/x86_64-pc-linux-gnu/11.2.0/include -I/usr/include/c++/11.2.0/include -pthreads")
 
+find_package(spdlog REQUIRED)
 
 add_library(
   cppiper
@@ -46,6 +47,8 @@ target_include_directories(cppiper_static PUBLIC
                            "${PROJECT_BINARY_DIR}"
                            include
                            )
+
+target_link_libraries(cppiper_static PRIVATE spdlog::spdlog)
 
 add_executable(test test/test.cc)
 
