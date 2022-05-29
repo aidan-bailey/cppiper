@@ -8,6 +8,8 @@
 #include <memory>
 #include <mutex>
 #include <ostream>
+#include <spdlog/logger.h>
+#include <spdlog/spdlog.h>
 #include <sstream>
 #include <stdexcept>
 #include <stdio.h>
@@ -17,43 +19,49 @@
 #include <unistd.h>
 #include <vector>
 
-const void cppiper::Sender::sender(std::string &pipepath,
+const void cppiper::Sender::sender(const std::string pipepath,
                                    std::vector<char> &buffer, int &statuscode,
                                    bool &msg_ready, const bool &stop,
                                    std::mutex &lock,
                                    std::condition_variable &msg_conditional,
                                    std::barrier<> &processed_barrier) {
   std::unique_lock lk(lock);
+  spdlog::debug("Initialising sender thread for '{}' pipe", pipepath);
   int retcode;
   if (not std::filesystem::exists(pipepath)) {
+    spdlog::debug("Pipe '{}' does not exist, creating...", pipepath);
     retcode = mkfifo(pipepath.c_str(), 00666);
     if (retcode == -1) {
-      std::cerr << "Failed to create sender pipe." << std::endl;
+      spdlog::error("Failed to create sender pipe '{}'", pipepath);
       statuscode = 1;
       lk.unlock();
       return;
     }
   }
-  std::ofstream pipe;
-  try {
-    pipe.open(pipepath, std::ofstream::out | std::ofstream::ate | std::ofstream::binary);
-  } catch (std::ofstream::failure e) {
-    std::cerr << "Failed to open sender pipe." << std::endl;
+  int pipe_fd;
+  spdlog::debug("Opening sender end of pipe '{}'...", pipepath);
+  pipe_fd = open(pipepath.c_str(), O_WRONLY | O_APPEND);
+  if (pipe_fd == -1) {
+    spdlog::error("Failed to open sender pipe '{}'", pipepath);
     statuscode = 2;
     lk.unlock();
     return;
   }
   std::stringstream ss;
+  spdlog::debug("Entering sender loop for pipe '{}'...", pipepath);
   while (true) {
-    if (not (msg_ready or stop)) {
+    if (not(msg_ready or stop)) {
+      spdlog::debug("Waiting on sender request for pipe '{}'...", pipepath);
       msg_conditional.wait(lk, [&]() { return msg_ready or stop; });
     }
     statuscode = 0;
     if (stop) {
+      spdlog::debug("Breaking from sender loop for pipe '{}'...", pipepath);
       break;
     }
+    spdlog::debug("Send request received for pipe '{}'", pipepath);
     if (buffer.empty()) {
-      std::cerr << "Attempt to send empty message." << std::endl;
+      spdlog::error("Attempt to send empty message over pipe '{}'", pipepath);
       statuscode = 3;
       msg_ready = false;
       lk.unlock();
@@ -61,51 +69,58 @@ const void cppiper::Sender::sender(std::string &pipepath,
       continue;
     }
     ss << std::setfill('0') << std::setw(8) << std::hex << buffer.size();
-    try {
-      pipe << ss.rdbuf();
-    } catch (std::ofstream::failure e) {
-      std::cerr << "Failed to send message size." << std::endl;
+    retcode = write(pipe_fd, ss.str().c_str(), 8);
+    ss.flush();
+    if (retcode == -1) {
+      spdlog::error("Failed to send message size bytes over pipe '{}'",
+                    pipepath);
       statuscode = 4;
-      ss.flush();
       msg_ready = false;
       lk.unlock();
       processed_barrier.arrive_and_wait();
       continue;
     }
-    ss.flush();
-    try {
-      std::for_each(buffer.begin(), buffer.end(),
-                    [&pipe](const char &s) { pipe << s; });
-    } catch (std::ofstream::failure e) {
-      std::cerr << "Failed to send message." << std::endl;
+    spdlog::debug("Sent message size bytes over pipe '{}'", pipepath);
+    retcode = write(pipe_fd, &buffer.front(), buffer.size());
+    if (retcode == -1) {
+      spdlog::error("Failed to send message bytes over pipe '{}'", pipepath);
       statuscode = 5;
       msg_ready = false;
       lk.unlock();
       processed_barrier.arrive_and_wait();
       continue;
     }
+    spdlog::debug("Sent message bytes over pipe '{}'", pipepath);
     msg_ready = false;
     processed_barrier.arrive_and_wait();
   }
-  pipe.flush();
-  pipe.close();
+  retcode = close(pipe_fd);
+  if (retcode == -1) {
+    spdlog::error("Failed to close sender end for pipe '{}'", pipepath);
+    statuscode = 6;
+  } else
+    spdlog::debug("Closed sender end for pipe '{}'", pipepath);
   lk.unlock();
 }
 
-cppiper::Sender::Sender(std::string pipepath)
-    : pipepath(pipepath), buffer(), statuscode(0), msg_ready(false),
+cppiper::Sender::Sender(std::string name, std::string pipepath)
+    : name(name), pipepath(pipepath), buffer(), statuscode(0), msg_ready(false),
       stop(false), lock(), msg_conditional(), processed_barrier(2),
-      thread(sender, std::ref(pipepath), std::ref(buffer), std::ref(statuscode),
+      thread(sender, pipepath, std::ref(buffer), std::ref(statuscode),
              std::ref(msg_ready), std::ref(stop), std::ref(lock),
-             std::ref(msg_conditional), std::ref(processed_barrier)) {}
-
-cppiper::Sender::~Sender(void) { terminate(); }
+             std::ref(msg_conditional), std::ref(processed_barrier)) {
+  spdlog::info("Constructed sender instance '{0}' with pipe '{1}'", name,
+               pipepath);
+}
 
 const int cppiper::Sender::get_status_code(void) { return statuscode; };
 
 const bool cppiper::Sender::send(const std::vector<char> &msg) {
+  spdlog::info("Sending message on sender instance '{}'", name);
   if (not thread.joinable() or stop) {
-    std::cerr << "Attempt to send message with terminated sender." << std::endl;
+    spdlog::error(
+        "Attempt to send message on non-running sender instance for '{}'",
+        name);
     return false;
   }
   {
@@ -116,12 +131,17 @@ const bool cppiper::Sender::send(const std::vector<char> &msg) {
   buffer = msg;
   msg_conditional.notify_one();
   processed_barrier.arrive_and_wait();
+  if (statuscode == 0)
+    spdlog::info("Message sent on sender instance '{}'", name);
+  else
+    spdlog::error("Message failed to send on sender instance '{}'", name);
   return statuscode == 0;
 }
 
 const bool cppiper::Sender::terminate(void) {
+  spdlog::debug("Terminating sender instance '{}'...", name);
   if (not thread.joinable() or stop) {
-    std::cerr << "Double termination for sender." << std::endl;
+    spdlog::warn("Double termination for sender instance '{}'", name);
     return true;
   }
   {
@@ -129,6 +149,8 @@ const bool cppiper::Sender::terminate(void) {
     stop = true;
   }
   msg_conditional.notify_one();
+  spdlog::debug("Joining thread for sender instance '{}'...", name);
   thread.join();
+  spdlog::info("Terminated sender instance '{}'", name);
   return true;
 }
