@@ -37,6 +37,11 @@ const void cppiper::Sender::sender(const std::string pipepath,
       lk.unlock();
       return;
     }
+  } else if (not std::filesystem::is_fifo(pipepath)) {
+    spdlog::error("File at provided sender path path '{}' is not a fifo", pipepath);
+    statuscode = 1;
+    lk.unlock();
+    return;
   }
   int pipe_fd;
   spdlog::debug("Opening sender end of pipe '{}'...", pipepath);
