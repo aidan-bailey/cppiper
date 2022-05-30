@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.10)
 project(CPPIPER VERSION 0.1)
 
 # Create options
-option(DEV "Generate compiler commands and set logging to debug." ON)
+option(DEV "Generate compiler commands and set logging to debug." OFF)
 
 # Set options
 set(PROJECT_BINARY_DIR "build")
@@ -41,7 +41,7 @@ target_include_directories(cppiper PUBLIC
                            "${PROJECT_BINARY_DIR}"
                            include
                            )
-#target_link_libraries(cppiper PRIVATE spdlog::spdlog)
+#target_link_libraries(cppiper PRIVATE spdlog::spdlog) # Not working right now as spdlog is installed as a static lib
 
 # Static library
 add_library(
