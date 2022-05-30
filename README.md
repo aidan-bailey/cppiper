@@ -1,11 +1,12 @@
 # cppiper
 Named pipe ipc library (WIP).
 
-# Requirements
+## Requirements
 - C++20
 - [spdlog](https://github.com/gabime/spdlog) for logging
 
-# TODO
-- [] populate this readme
-- [] spdlog for dynamic lib
-- [] proper testing using [cache2](https://github.com/catchorg/Catch2)
+## TODO
+- [ ] populate this readme
+- [ ] spdlog for dynamic lib
+- [ ] docs
+- [ ] proper testing using [cache2](https://github.com/catchorg/Catch2)
