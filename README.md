@@ -10,3 +10,4 @@ Named pipe ipc library (WIP).
 - [ ] spdlog for dynamic lib
 - [ ] docs
 - [ ] proper testing using [cache2](https://github.com/catchorg/Catch2)
+- [ ] add garbage collector for pipe manager
