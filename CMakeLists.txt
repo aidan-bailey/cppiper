@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.10)
 project(CPPIPER VERSION 0.1)
 
 # Create options
-option(DEV "Generate compiler commands and set logging to debug." OFF)
+option(DEV "Generate compiler commands and set logging to debug." ON)
 
 # Set options
 set(PROJECT_BINARY_DIR "build")
@@ -32,6 +32,7 @@ find_package(spdlog REQUIRED) # logging
 add_library(
   cppiper
   SHARED
+  src/pipemanager.cc
   src/sender.cc
   src/receiver.cc
   )
@@ -46,6 +47,7 @@ target_include_directories(cppiper PUBLIC
 add_library(
   cppiper_static
   STATIC
+  src/pipemanager.cc
   src/sender.cc
   src/receiver.cc
   )
