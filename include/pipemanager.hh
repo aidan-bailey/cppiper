@@ -19,6 +19,7 @@ public:
   PipeManager(std::string pipedir);
   ~PipeManager(void);
   std::string make_pipe(void);
+  bool remove_pipe(std::string pipepath);
 };
 
 } // namespace cppiper

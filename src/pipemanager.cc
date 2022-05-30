@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <mutex>
 #include <spdlog/spdlog.h>
+#include <string>
 #include <sys/stat.h>
 
 std::string cppiper::random_hex(int len) {
@@ -32,6 +33,17 @@ std::string cppiper::PipeManager::make_pipe(void) {
   spdlog::debug("New pipe created at '{}'", pipepath);
   return pipepath;
 }
+
+bool cppiper::PipeManager::remove_pipe(std::string pipepath) {
+    std::lock_guard lk(lock);
+    if (not std::filesystem::exists(pipepath)){
+        spdlog::error("Failed to remove pipe at '{}' as it does not exist", pipepath);
+        return false;
+    }
+    std::filesystem::remove(pipepath);
+    spdlog::debug("Removed pipe at '{}'", pipepath);
+    return true;
+};
 
 cppiper::PipeManager::~PipeManager(void) {
   spdlog::debug("Destructing pipe manager...");
