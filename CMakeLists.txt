@@ -87,9 +87,9 @@ install(
     Devel
 )
 
-add_executable(test test/test.cc)
-target_include_directories(test PUBLIC
+add_executable(benchmark benchmark/benchmark.cc)
+target_include_directories(benchmark PUBLIC
                            "${PROJECT_BINARY_DIR}"
                            include
                            )
-target_link_libraries(test PUBLIC cppiper)
+target_link_libraries(benchmark PUBLIC cppiper)

@@ -19,11 +19,13 @@ int main(int argc, char *argv[]) {
     spdlog::debug("Dev mode enabled");
   } else
     spdlog::set_level(spdlog::level::err);
-  cppiper::PipeManager pm("/tmp/pipemanager");
-  cppiper::Sender server_sender("Server", "server");
-  cppiper::Receiver server_receiver("Client", "server");
+  cppiper::PipeManager pm("pipemanager");
+  std::string pipe_name = pm.make_pipe();
+  cppiper::Sender server_sender("Server", pipe_name);
+  cppiper::Receiver server_receiver("Client", pipe_name);
   std::vector<char> msg(5, 'A');
-  int testset_size = 100000;
+  int testset_size = 10000;
+  std::cout << "Message: ";
   for (char i : msg)
     std::cout << i;
   std::cout << std::endl;
@@ -39,5 +41,6 @@ int main(int argc, char *argv[]) {
   std::cout << "Avg of " << delta.count() / testset_size << "us/msg"
             << std::endl;
   server_sender.terminate();
+  pm.remove_pipe(pipe_name);
   return 0;
 }
