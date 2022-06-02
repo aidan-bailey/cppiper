@@ -35,6 +35,10 @@ After the build step, `cppiper` can be installed as a system lib.
 sudo cmake --install .
 ```
 
+## Benchmark
+
+A benchmark executable, `benchmark`, will be built along with the library. This doubles as an example of usage, the source code of which can be found in the *benchmark* directory.
+
 ## TODO
 - [ ] cppiper dynamic lib
 - [ ] docs
