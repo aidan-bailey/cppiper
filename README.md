@@ -2,7 +2,7 @@
 Named pipe ipc library (WIP).
 
 ## Requirements
-- C++17 capable compiler
+- `C++17` capable compiler
 - [cmake](https://cmake.org/)
 - [spdlog](https://github.com/gabime/spdlog) for logging
 
