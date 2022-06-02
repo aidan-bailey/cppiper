@@ -20,7 +20,7 @@
 #include <vector>
 
 const void cppiper::Sender::sender(const std::string pipepath,
-                                   std::vector<char> &buffer, int &statuscode,
+                                   std::string &buffer, int &statuscode,
                                    bool &msg_ready, const bool &stop,
                                    std::mutex &lock,
                                    std::condition_variable &msg_conditional) {
@@ -116,7 +116,7 @@ cppiper::Sender::Sender(std::string name, std::string pipepath)
 
 const int cppiper::Sender::get_status_code(void) { return statuscode; };
 
-const bool cppiper::Sender::send(const std::vector<char> &msg) {
+const bool cppiper::Sender::send(const std::string msg) {
   spdlog::info("Sending message on sender instance '{}'", name);
   if (not thread.joinable() or stop) {
     spdlog::error(
@@ -126,10 +126,9 @@ const bool cppiper::Sender::send(const std::vector<char> &msg) {
   }
   {
     std::lock_guard lk(lock);
-    buffer.clear();
+    buffer = msg;
     msg_ready = true;
   }
-  buffer = msg;
   msg_conditional.notify_one();
   std::lock_guard lk(lock);
   if (statuscode == 0)

@@ -15,7 +15,7 @@
 
 const void cppiper::Receiver::receiver(
     std::string pipepath, bool &msg_ready, int &statuscode,
-    std::queue<std::vector<char>> &msg_queue, std::mutex &queue_lock,
+    std::queue<std::string> &msg_queue, std::mutex &queue_lock,
     std::condition_variable &queue_condition) {
   // std::lock_guard lk(queue_lock);
   spdlog::debug("Initialising receiver thread for '{}' pipe", pipepath);
@@ -78,10 +78,11 @@ const void cppiper::Receiver::receiver(
       statuscode = 5;
       continue;
     }
+
     for (auto ptr = subbuffer; ptr < subbuffer + 8; ptr++)
       buffer.push_back(*ptr);
     spdlog::debug("Received message over pipe '{}'", pipepath);
-    msg_queue.push(buffer);
+    msg_queue.push(std::string(subbuffer, msg_size));
     msg_ready = true;
     queue_lock.unlock();
     queue_condition.notify_one();
@@ -114,7 +115,7 @@ cppiper::Receiver::~Receiver(void) {
   }
 }
 
-const std::optional<std::vector<char>> cppiper::Receiver::receive(bool wait) {
+const std::optional<const std::string> cppiper::Receiver::receive(bool wait) {
   std::unique_lock lk(queue_lock);
   spdlog::info("Trying to receive message on receiver instance '{}'", name);
   if (not msg_ready and wait) {
@@ -125,7 +126,7 @@ const std::optional<std::vector<char>> cppiper::Receiver::receive(bool wait) {
     lk.unlock();
     return {};
   }
-  std::vector<char> msg = msg_queue.front();
+  std::string msg = msg_queue.front();
   msg_queue.pop();
   if (msg_queue.empty())
     msg_ready = false;

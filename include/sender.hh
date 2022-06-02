@@ -18,13 +18,13 @@ private:
   std::mutex lock;
   bool stop;
   bool msg_ready;
-  std::vector<char> buffer;
+  std::string buffer;
   std::string pipepath;
   int statuscode;
   std::string name;
 
   const static void sender(const std::string pipepath,
-                           std::vector<char> &buffer, int &statuscode,
+                           std::string &buffer, int &statuscode,
                            bool &msg_ready, const bool &stop, std::mutex &lock,
                            std::condition_variable &msg_conditional);
 
@@ -32,7 +32,7 @@ public:
   Sender(void) = delete;
   Sender(std::string name, std::string pipepath);
   const int get_status_code(void);
-  const bool send(const std::vector<char> &msg);
+  const bool send(const std::string msg);
   const bool terminate(void);
 };
 

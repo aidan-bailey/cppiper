@@ -17,7 +17,7 @@ private:
   std::thread thread;
   std::condition_variable queue_condition;
   std::mutex queue_lock;
-  std::queue<std::vector<char>> msg_queue;
+  std::queue<std::string> msg_queue;
   int statuscode;
   bool msg_ready;
   std::string pipepath;
@@ -25,7 +25,7 @@ private:
 
   const static void receiver(std::string pipepath, bool &msg_ready,
                              int &statuscode,
-                             std::queue<std::vector<char>> &msg_queue,
+                             std::queue<std::string> &msg_queue,
                              std::mutex &queue_lock,
                              std::condition_variable &queue_condition);
 
@@ -33,7 +33,7 @@ public:
   Receiver(void) = delete;
   Receiver(std::string name, std::string pipepath);
   ~Receiver(void);
-  const std::optional<std::vector<char>> receive(bool wait);
+  const std::optional<const std::string> receive(bool wait);
   const bool wait(void);
 };
 
