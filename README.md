@@ -11,7 +11,7 @@ Named pipe ipc library (WIP).
 ``` sh
 mkdir build
 cd build
-cmake ..    # add the flag `-D DEV=ON` for debug logging to stdout
+cmake ..            # add the flag `-D DEV=ON` for debug logging to stdout
 cmake --build .
 ```
 
