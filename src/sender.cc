@@ -1,4 +1,4 @@
-#include "sender.hh"
+#include "../include/sender.hh"
 #include <algorithm>
 #include <fcntl.h>
 #include <filesystem>
@@ -23,8 +23,7 @@ const void cppiper::Sender::sender(const std::string pipepath,
                                    std::vector<char> &buffer, int &statuscode,
                                    bool &msg_ready, const bool &stop,
                                    std::mutex &lock,
-                                   std::condition_variable &msg_conditional,
-                                   std::barrier<> &processed_barrier) {
+                                   std::condition_variable &msg_conditional) {
   std::unique_lock lk(lock);
   spdlog::debug("Initialising sender thread for '{}' pipe", pipepath);
   int retcode;
@@ -38,7 +37,8 @@ const void cppiper::Sender::sender(const std::string pipepath,
       return;
     }
   } else if (not std::filesystem::is_fifo(pipepath)) {
-    spdlog::error("File at provided sender path path '{}' is not a fifo", pipepath);
+    spdlog::error("File at provided sender path path '{}' is not a fifo",
+                  pipepath);
     statuscode = 1;
     lk.unlock();
     return;
@@ -70,7 +70,6 @@ const void cppiper::Sender::sender(const std::string pipepath,
       statuscode = 3;
       msg_ready = false;
       lk.unlock();
-      processed_barrier.arrive_and_wait();
       continue;
     }
     ss << std::setfill('0') << std::setw(8) << std::hex << buffer.size();
@@ -82,7 +81,6 @@ const void cppiper::Sender::sender(const std::string pipepath,
       statuscode = 4;
       msg_ready = false;
       lk.unlock();
-      processed_barrier.arrive_and_wait();
       continue;
     }
     spdlog::debug("Sent message size bytes over pipe '{}'", pipepath);
@@ -92,12 +90,10 @@ const void cppiper::Sender::sender(const std::string pipepath,
       statuscode = 5;
       msg_ready = false;
       lk.unlock();
-      processed_barrier.arrive_and_wait();
       continue;
     }
     spdlog::debug("Sent message bytes over pipe '{}'", pipepath);
     msg_ready = false;
-    processed_barrier.arrive_and_wait();
   }
   retcode = close(pipe_fd);
   if (retcode == -1) {
@@ -110,10 +106,10 @@ const void cppiper::Sender::sender(const std::string pipepath,
 
 cppiper::Sender::Sender(std::string name, std::string pipepath)
     : name(name), pipepath(pipepath), buffer(), statuscode(0), msg_ready(false),
-      stop(false), lock(), msg_conditional(), processed_barrier(2),
+      stop(false), lock(), msg_conditional(),
       thread(sender, pipepath, std::ref(buffer), std::ref(statuscode),
              std::ref(msg_ready), std::ref(stop), std::ref(lock),
-             std::ref(msg_conditional), std::ref(processed_barrier)) {
+             std::ref(msg_conditional)) {
   spdlog::info("Constructed sender instance '{0}' with pipe '{1}'", name,
                pipepath);
 }
@@ -135,7 +131,7 @@ const bool cppiper::Sender::send(const std::vector<char> &msg) {
   }
   buffer = msg;
   msg_conditional.notify_one();
-  processed_barrier.arrive_and_wait();
+  std::lock_guard lk(lock);
   if (statuscode == 0)
     spdlog::info("Message sent on sender instance '{}'", name);
   else

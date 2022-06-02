@@ -1,6 +1,5 @@
 #ifndef SENDER_HH_
 #define SENDER_HH_
-#include <barrier>
 #include <condition_variable>
 #include <memory>
 #include <mutex>
@@ -8,7 +7,6 @@
 #include <string>
 #include <thread>
 #include <vector>
-//#include <spdlog/spdlog.h>
 #include <spdlog/spdlog.h>
 
 namespace cppiper {
@@ -16,8 +14,6 @@ namespace cppiper {
 class Sender {
 private:
   std::thread thread;
-  //std::shared_ptr<spdlog::logger> logger;// = spdlog::basic_logger_mt("sender_logger", "logs/basic-log.txt");
-  std::barrier<> processed_barrier;
   std::condition_variable msg_conditional;
   std::mutex lock;
   bool stop;
@@ -27,12 +23,10 @@ private:
   int statuscode;
   std::string name;
 
-
-  const static void sender(const std::string pipepath, std::vector<char> &buffer,
-                           int &statuscode, bool &msg_ready, const bool &stop,
-                           std::mutex &lock,
-                           std::condition_variable &msg_conditional,
-                           std::barrier<> &processed_barrier);
+  const static void sender(const std::string pipepath,
+                           std::vector<char> &buffer, int &statuscode,
+                           bool &msg_ready, const bool &stop, std::mutex &lock,
+                           std::condition_variable &msg_conditional);
 
 public:
   Sender(void) = delete;
