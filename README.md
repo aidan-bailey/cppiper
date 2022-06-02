@@ -8,22 +8,10 @@ Named pipe ipc library (WIP).
 
 ## Building
 
-Create and enter the build directory.
-
 ``` sh
 mkdir build
 cd build
-```
-
-Initialise build files.
-
-``` sh
 cmake ..    # add the flag `-D DEV=ON` for debug logging to stdout
-```
-
-Build `cppiper`.
-
-``` sh
 cmake --build .
 ```
 
