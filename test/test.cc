@@ -3,8 +3,10 @@
 #include "sender.hh"
 #include <chrono>
 #include <iostream>
+#include <pipemanager.hh>
 #include <ratio>
 #include <spdlog/common.h>
+#include <spdlog/spdlog.h>
 #include <string>
 #include <thread>
 #include <tuple>
@@ -12,15 +14,16 @@
 int main(int argc, char *argv[]) {
   std::cout << "cppiper v" << CPPIPER_VERSION_MAJOR << '.'
             << CPPIPER_VERSION_MINOR << std::endl;
-  std::cout << "Dev Mode: " << DEV << std::endl;
-  if (DEV)
+  if (DEV) {
     spdlog::set_level(spdlog::level::debug);
-  else
+    spdlog::debug("Dev mode enabled");
+  } else
     spdlog::set_level(spdlog::level::err);
+  cppiper::PipeManager pm("/tmp/pipemanager");
   cppiper::Sender server_sender("Server", "server");
   cppiper::Receiver server_receiver("Client", "server");
   std::vector<char> msg(5, 'A');
-  int testset_size = 20;
+  int testset_size = 100000;
   for (char i : msg)
     std::cout << i;
   std::cout << std::endl;
