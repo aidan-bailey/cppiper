@@ -1,0 +1,88 @@
+\hypertarget{classcppiper_1_1PipeManager}{}\doxysection{cppiper\+::Pipe\+Manager Class Reference}
+\label{classcppiper_1_1PipeManager}\index{cppiper::PipeManager@{cppiper::PipeManager}}
+
+
+A pipe managing class.  
+
+
+
+
+{\ttfamily \#include $<$pipemanager.\+hh$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classcppiper_1_1PipeManager_a5d2a75ed8da9baf2df6cebb1ce8c1c6d}\label{classcppiper_1_1PipeManager_a5d2a75ed8da9baf2df6cebb1ce8c1c6d}} 
+{\bfseries Pipe\+Manager} (void)=delete
+\begin{DoxyCompactList}\small\item\em Deleted. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classcppiper_1_1PipeManager_a296e1872f707154904a49b68db108888}{Pipe\+Manager}} (std\+::string pipedir)
+\begin{DoxyCompactList}\small\item\em Construct a pipe manager. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{classcppiper_1_1PipeManager_a0a3bf74e413bdcea9f1b3db5e93138cf}{make\+\_\+pipe}} (void)
+\begin{DoxyCompactList}\small\item\em Make a new fifo pipe with a random name. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classcppiper_1_1PipeManager_a08954d084139b42d17f259e8fa68abc6}{remove\+\_\+pipe}} (std\+::string pipepath)
+\begin{DoxyCompactList}\small\item\em Remove a pipe from the pipe directory. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classcppiper_1_1PipeManager_a77404f2b48721a0317590855e9a65738}\label{classcppiper_1_1PipeManager_a77404f2b48721a0317590855e9a65738}} 
+void {\bfseries clear} (void)
+\begin{DoxyCompactList}\small\item\em Clear the pipe directory of pipes. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A pipe managing class. 
+
+Manages the creation and removal of named pipes in a specific directory (pipe directory). 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classcppiper_1_1PipeManager_a296e1872f707154904a49b68db108888}\label{classcppiper_1_1PipeManager_a296e1872f707154904a49b68db108888}} 
+\index{cppiper::PipeManager@{cppiper::PipeManager}!PipeManager@{PipeManager}}
+\index{PipeManager@{PipeManager}!cppiper::PipeManager@{cppiper::PipeManager}}
+\doxysubsubsection{\texorpdfstring{PipeManager()}{PipeManager()}}
+{\footnotesize\ttfamily cppiper\+::\+Pipe\+Manager\+::\+Pipe\+Manager (\begin{DoxyParamCaption}\item[{std\+::string}]{pipedir }\end{DoxyParamCaption})}
+
+
+
+Construct a pipe manager. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pipedir} & a directory path for the pipes (this directory will be created if it does not exist). \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classcppiper_1_1PipeManager_a0a3bf74e413bdcea9f1b3db5e93138cf}\label{classcppiper_1_1PipeManager_a0a3bf74e413bdcea9f1b3db5e93138cf}} 
+\index{cppiper::PipeManager@{cppiper::PipeManager}!make\_pipe@{make\_pipe}}
+\index{make\_pipe@{make\_pipe}!cppiper::PipeManager@{cppiper::PipeManager}}
+\doxysubsubsection{\texorpdfstring{make\_pipe()}{make\_pipe()}}
+{\footnotesize\ttfamily std\+::string cppiper\+::\+Pipe\+Manager\+::make\+\_\+pipe (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Make a new fifo pipe with a random name. 
+
+\begin{DoxyReturn}{Returns}
+The path to the pipe. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classcppiper_1_1PipeManager_a08954d084139b42d17f259e8fa68abc6}\label{classcppiper_1_1PipeManager_a08954d084139b42d17f259e8fa68abc6}} 
+\index{cppiper::PipeManager@{cppiper::PipeManager}!remove\_pipe@{remove\_pipe}}
+\index{remove\_pipe@{remove\_pipe}!cppiper::PipeManager@{cppiper::PipeManager}}
+\doxysubsubsection{\texorpdfstring{remove\_pipe()}{remove\_pipe()}}
+{\footnotesize\ttfamily bool cppiper\+::\+Pipe\+Manager\+::remove\+\_\+pipe (\begin{DoxyParamCaption}\item[{std\+::string}]{pipepath }\end{DoxyParamCaption})}
+
+
+
+Remove a pipe from the pipe directory. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pipepath} & path to the pipe. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+whether or not the removal was successful. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/aidanb/\+Repos/\+Personal/cppiper/include/pipemanager.\+hh\end{DoxyCompactItemize}

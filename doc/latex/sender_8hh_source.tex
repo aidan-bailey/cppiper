@@ -1,0 +1,56 @@
+\hypertarget{sender_8hh_source}{}\doxysection{sender.\+hh}
+\label{sender_8hh_source}\index{/home/aidanb/Repos/Personal/cppiper/include/sender.hh@{/home/aidanb/Repos/Personal/cppiper/include/sender.hh}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#ifndef SENDER\_HH\_}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#define SENDER\_HH\_}}
+\DoxyCodeLine{3 \textcolor{preprocessor}{\#include <condition\_variable>}}
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#include <memory>}}
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#include <mutex>}}
+\DoxyCodeLine{6 \textcolor{preprocessor}{\#include <spdlog/logger.h>}}
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#include <spdlog/spdlog.h>}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#include <string>}}
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#include <thread>}}
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#include <vector>}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 \textcolor{keyword}{namespace }cppiper \{}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{15 \textcolor{keyword}{class }\mbox{\hyperlink{classcppiper_1_1Sender}{Sender}} \{}
+\DoxyCodeLine{16 \textcolor{keyword}{private}:}
+\DoxyCodeLine{18   std::thread thread;}
+\DoxyCodeLine{20   std::condition\_variable msg\_conditional;}
+\DoxyCodeLine{22   std::mutex lock;}
+\DoxyCodeLine{24   \textcolor{keywordtype}{bool} stop;}
+\DoxyCodeLine{26   \textcolor{keywordtype}{bool} msg\_ready;}
+\DoxyCodeLine{28   std::string buffer;}
+\DoxyCodeLine{30   \textcolor{keyword}{const} std::string pipepath;}
+\DoxyCodeLine{32   \textcolor{keyword}{const} std::string name;}
+\DoxyCodeLine{34   \textcolor{keywordtype}{int} statuscode;}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{37 }
+\DoxyCodeLine{46   \textcolor{keyword}{const} \textcolor{keyword}{static} \textcolor{keywordtype}{void} sender(\textcolor{keyword}{const} std::string pipepath, std::string \&buffer,}
+\DoxyCodeLine{47                            \textcolor{keywordtype}{int} \&statuscode, \textcolor{keywordtype}{bool} \&msg\_ready, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} \&stop,}
+\DoxyCodeLine{48                            std::mutex \&lock,}
+\DoxyCodeLine{49                            std::condition\_variable \&msg\_conditional);}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51 \textcolor{keyword}{public}:}
+\DoxyCodeLine{53   \mbox{\hyperlink{classcppiper_1_1Sender_aa866a5c8fb34a36a189df8d5f2dafdd1}{Sender}}(\textcolor{keywordtype}{void}) = \textcolor{keyword}{delete};}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{56 }
+\DoxyCodeLine{60   \mbox{\hyperlink{classcppiper_1_1Sender_a08eb5bf4912af33e0629c05cdfc45d32}{Sender}}(\textcolor{keyword}{const} std::string name, \textcolor{keyword}{const} std::string pipepath);}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{63 }
+\DoxyCodeLine{66   \textcolor{keyword}{const} \textcolor{keywordtype}{int} \mbox{\hyperlink{classcppiper_1_1Sender_a8c3bee391c77c476e65627f721ef27a6}{get\_status\_code}}(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{69 }
+\DoxyCodeLine{73   \textcolor{keyword}{const} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classcppiper_1_1Sender_a0525dbc3a645b284c35d9f0a3bdaf06f}{send}}(\textcolor{keyword}{const} std::string msg);}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{76 }
+\DoxyCodeLine{79   \textcolor{keyword}{const} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classcppiper_1_1Sender_a6de6b49e48ea58608e4a334fb4967361}{terminate}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{80 \};}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82 \} \textcolor{comment}{// namespace cppiper}}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// SENDER\_HH\_}}
+
+\end{DoxyCode}

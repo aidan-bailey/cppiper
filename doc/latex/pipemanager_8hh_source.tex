@@ -1,0 +1,42 @@
+\hypertarget{pipemanager_8hh_source}{}\doxysection{pipemanager.\+hh}
+\label{pipemanager_8hh_source}\index{/home/aidanb/Repos/Personal/cppiper/include/pipemanager.hh@{/home/aidanb/Repos/Personal/cppiper/include/pipemanager.hh}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#ifndef PIPEMANAGER\_HH\_}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#define PIPEMANAGER\_HH\_}}
+\DoxyCodeLine{3 \textcolor{preprocessor}{\#include <mutex>}}
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#include <sstream>}}
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#include <string>}}
+\DoxyCodeLine{6 \textcolor{preprocessor}{\#include <tuple>}}
+\DoxyCodeLine{7 }
+\DoxyCodeLine{8 \textcolor{keyword}{namespace }cppiper \{}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{11 }
+\DoxyCodeLine{15 std::string random\_hex(\textcolor{keywordtype}{int} len);}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{18 }
+\DoxyCodeLine{22 \textcolor{keyword}{class }\mbox{\hyperlink{classcppiper_1_1PipeManager}{PipeManager}} \{}
+\DoxyCodeLine{23 \textcolor{keyword}{private}:}
+\DoxyCodeLine{25   \textcolor{keyword}{const} std::string pipedir;}
+\DoxyCodeLine{27   std::mutex lock;}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{29 \textcolor{keyword}{public}:}
+\DoxyCodeLine{31   \mbox{\hyperlink{classcppiper_1_1PipeManager_a5d2a75ed8da9baf2df6cebb1ce8c1c6d}{PipeManager}}(\textcolor{keywordtype}{void}) = \textcolor{keyword}{delete};}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{34 }
+\DoxyCodeLine{38   \mbox{\hyperlink{classcppiper_1_1PipeManager_a296e1872f707154904a49b68db108888}{PipeManager}}(std::string pipedir);}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{41 }
+\DoxyCodeLine{44   std::string \mbox{\hyperlink{classcppiper_1_1PipeManager_a0a3bf74e413bdcea9f1b3db5e93138cf}{make\_pipe}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{47 }
+\DoxyCodeLine{51   \textcolor{keywordtype}{bool} \mbox{\hyperlink{classcppiper_1_1PipeManager_a08954d084139b42d17f259e8fa68abc6}{remove\_pipe}}(std::string pipepath);}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{54   \textcolor{keywordtype}{void} \mbox{\hyperlink{classcppiper_1_1PipeManager_a77404f2b48721a0317590855e9a65738}{clear}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{55 \};}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57 \} \textcolor{comment}{// namespace cppiper}}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// PIPEMANAGER\_HH\_}}
+
+\end{DoxyCode}
