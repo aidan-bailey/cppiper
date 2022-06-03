@@ -20,10 +20,10 @@ private:
   std::queue<std::string> msg_queue;
   int statuscode;
   bool msg_ready;
-  std::string pipepath;
-  std::string name;
+  const std::string pipepath;
+  const std::string name;
 
-  const static void receiver(std::string pipepath, bool &msg_ready,
+  const static void receiver(const std::string pipepath, bool &msg_ready,
                              int &statuscode,
                              std::queue<std::string> &msg_queue,
                              std::mutex &queue_lock,
@@ -31,7 +31,7 @@ private:
 
 public:
   Receiver(void) = delete;
-  Receiver(std::string name, std::string pipepath);
+  Receiver(const std::string name, const std::string pipepath);
   ~Receiver(void);
   const std::optional<const std::string> receive(bool wait);
   const bool wait(void);

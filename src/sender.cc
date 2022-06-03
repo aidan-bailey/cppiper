@@ -43,9 +43,8 @@ const void cppiper::Sender::sender(const std::string pipepath,
     lk.unlock();
     return;
   }
-  int pipe_fd;
   spdlog::debug("Opening sender end of pipe '{}'...", pipepath);
-  pipe_fd = open(pipepath.c_str(), O_WRONLY | O_APPEND);
+  const int pipe_fd = open(pipepath.c_str(), O_WRONLY | O_APPEND);
   if (pipe_fd == -1) {
     spdlog::error("Failed to open sender pipe '{}'", pipepath);
     statuscode = 2;

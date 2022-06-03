@@ -14,15 +14,14 @@
 #include <vector>
 
 const void cppiper::Receiver::receiver(
-    std::string pipepath, bool &msg_ready, int &statuscode,
+    const std::string pipepath, bool &msg_ready, int &statuscode,
     std::queue<std::string> &msg_queue, std::mutex &queue_lock,
     std::condition_variable &queue_condition) {
   // std::lock_guard lk(queue_lock);
   spdlog::debug("Initialising receiver thread for '{}' pipe", pipepath);
   int retcode;
-  int pipe_fd;
   spdlog::debug("Opening receiver end of pipe '{}'...", pipepath);
-  pipe_fd = open(pipepath.c_str(), O_RDONLY);
+  const int pipe_fd = open(pipepath.c_str(), O_RDONLY);
   if (pipe_fd == -1) {
     spdlog::error("Failed to open receiver pipe '{}'", pipepath);
     statuscode = 1;
@@ -97,7 +96,7 @@ const void cppiper::Receiver::receiver(
   queue_condition.notify_one();
 }
 
-cppiper::Receiver::Receiver(std::string name, std::string pipepath)
+cppiper::Receiver::Receiver(const std::string name, const std::string pipepath)
     : name(name), pipepath(pipepath), msg_ready(false), statuscode(0),
       msg_queue(), queue_lock(), queue_condition(),
       thread(receiver, pipepath, std::ref(msg_ready), std::ref(statuscode),
