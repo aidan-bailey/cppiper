@@ -21,8 +21,10 @@ std::string random_hex(int len);
  */
 class PipeManager {
 private:
-  const std::string pipedir; //!< Pipe directory path.
-  std::mutex lock;           //!< Pipe directory lock.
+  //! Pipe directory path.
+  const std::string pipedir;
+  //! Pipe directory lock.
+  std::mutex lock;
 
 public:
   //! Deleted.
@@ -30,8 +32,8 @@ public:
 
   //! Construct a pipe manager.
   /*!
-    \param pipedir a directory path for the pipes (this directory will be created
-    if it does not exist).
+    \param pipedir a directory path for the pipes (this directory will be
+    created if it does not exist).
    */
   PipeManager(std::string pipedir);
 
