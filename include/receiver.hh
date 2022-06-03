@@ -32,7 +32,7 @@ private:
   int statuscode;
 
   //! Static method to be executed in the receiver thread.
-  /*
+  /*!
     \param pipepath path to the receiver pipe.
     \param msg_ready reference to message ready signal bool.
     \param statuscode reference to status code.
