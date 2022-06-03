@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
   cppiper::Sender server_sender("Server", pipe_name);
   cppiper::Receiver server_receiver("Client", pipe_name);
   std::string msg = "AAA\0AA"s;
-  int testset_size = 1000000;
+  int testset_size = 100000;
   std::cout << "Message: ";
   for (char i : msg)
     std::cout << i;
