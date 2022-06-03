@@ -5,13 +5,14 @@ Named pipe ipc library (WIP).
 - `C++17` capable compiler
 - [cmake](https://cmake.org/)
 - [spdlog](https://github.com/gabime/spdlog) for logging
+- [doxygen](https://www.doxygen.nl/) for docs
 
 ## Building
 
 ``` sh
 mkdir build
 cd build
-cmake ..            # add the flag `-D DEV=ON` for debug logging to stdout
+cmake ..            # `-D DEV=ON` for debug logging, `-D DOC=ON` for documentation generation
 cmake --build .
 ```
 
