@@ -34,7 +34,7 @@ private:
   int statuscode;
 
   //! Static method to be executed in the sender thread.
-  /*
+  /*!
    \param pipepath path to the sender pipe.
    \param buffer reference to message buffer.
    \param statuscode reference to status code.
