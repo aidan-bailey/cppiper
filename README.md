@@ -30,6 +30,5 @@ A benchmark executable, `benchmark`, will be built along with the library. This 
 
 ## TODO
 - [ ] cppiper dynamic lib
-- [ ] docs
 - [ ] proper testing using [cache2](https://github.com/catchorg/Catch2)
 - [ ] garbage collector for pipe manager
