@@ -106,14 +106,6 @@ cppiper::Receiver::Receiver(const std::string name, const std::string pipepath)
                pipepath);
 }
 
-cppiper::Receiver::~Receiver(void) {
-  wait();
-  std::unique_lock lk(queue_lock);
-  while (not msg_queue.empty()) {
-    msg_queue.pop();
-  }
-}
-
 const std::optional<const std::string> cppiper::Receiver::receive(bool wait) {
   std::unique_lock lk(queue_lock);
   spdlog::info("Trying to receive message on receiver instance '{}'", name);
