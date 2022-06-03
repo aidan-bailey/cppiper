@@ -19,9 +19,9 @@ private:
   bool stop;
   bool msg_ready;
   std::string buffer;
-  std::string pipepath;
+  const std::string pipepath;
+  const std::string name;
   int statuscode;
-  std::string name;
 
   const static void sender(const std::string pipepath,
                            std::string &buffer, int &statuscode,
@@ -30,8 +30,8 @@ private:
 
 public:
   Sender(void) = delete;
-  Sender(std::string name, std::string pipepath);
-  const int get_status_code(void);
+  Sender(const std::string name, const std::string pipepath);
+  const int get_status_code(void) const;
   const bool send(const std::string msg);
   const bool terminate(void);
 };

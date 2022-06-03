@@ -104,7 +104,7 @@ const void cppiper::Sender::sender(const std::string pipepath,
   lk.unlock();
 }
 
-cppiper::Sender::Sender(std::string name, std::string pipepath)
+cppiper::Sender::Sender(const std::string name, const std::string pipepath)
     : name(name), pipepath(pipepath), buffer(), statuscode(0), msg_ready(false),
       stop(false), lock(), msg_conditional(),
       thread(sender, pipepath, std::ref(buffer), std::ref(statuscode),
@@ -114,7 +114,7 @@ cppiper::Sender::Sender(std::string name, std::string pipepath)
                pipepath);
 }
 
-const int cppiper::Sender::get_status_code(void) { return statuscode; };
+const int cppiper::Sender::get_status_code(void) const { return statuscode; };
 
 const bool cppiper::Sender::send(const std::string msg) {
   spdlog::info("Sending message on sender instance '{}'", name);
