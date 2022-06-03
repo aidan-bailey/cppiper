@@ -16,24 +16,24 @@ class Sender {
 private:
   //! Sender thread.
   std::thread thread;
-  //! Conditional used to synchronise with thread.
+  //! Conditional used to synchronise with the thread.
   std::condition_variable msg_conditional;
   //! Lock utilised by conditional.
   std::mutex lock;
   //! Flag used to stop thread.
   bool stop;
-  //! Flag used to signal message is ready.
+  //! Flag used to signal message is ready to be sent.
   bool msg_ready;
   //! Message buffer.
   std::string buffer;
   //! Path to the sender pipe.
   const std::string pipepath;
-  //! Identifying name of this sender process (for debugging).
+  //! Identifying name of this sender instance (for debugging).
   const std::string name;
   //! Code representing current status of sender thread.
   int statuscode;
 
-  //! Static method to be used by the sender thread.
+  //! Static method to be executed in the sender thread.
   /*
    \param pipepath path to the sender pipe.
    \param buffer reference to message buffer.
@@ -54,7 +54,7 @@ public:
 
   //! Construct a sender.
   /*!
-    \param name identifying name of this sender process (for debugging).
+    \param name identifying name of this sender instance (for debugging).
     \param pipepath path to the sender pipe.
    */
   Sender(const std::string name, const std::string pipepath);
