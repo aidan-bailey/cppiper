@@ -45,10 +45,10 @@ bool cppiper::PipeManager::remove_pipe(std::string pipepath) {
     return true;
 };
 
-cppiper::PipeManager::~PipeManager(void) {
-  spdlog::debug("Destructing pipe manager...");
+void cppiper::PipeManager::clear(void) {
+  spdlog::debug("Clearing pipes...");
   if (not std::filesystem::exists(pipedir))
-    spdlog::warn("Pipe directory at '{}' non-existent at deconstruction",
+    spdlog::error("Attempt to clear non-existent pipe directory '{}'",
                  pipedir);
   else {
     for (const auto &entry : std::filesystem::directory_iterator(pipedir)) {
