@@ -25,12 +25,8 @@ int main(int argc, char *argv[]) {
   std::string pipe_name = pm.make_pipe();
   cppiper::Sender server_sender("Server", pipe_name);
   cppiper::Receiver server_receiver("Client", pipe_name);
-  std::string msg = "AAA\0AA"s;
-  int testset_size = 100000;
-  std::cout << "Message: ";
-  for (char i : msg)
-    std::cout << i;
-  std::cout << std::endl;
+  std::string msg = cppiper::random_hex(10000);
+  int testset_size = 1000000;
   std::chrono::high_resolution_clock::time_point start =
       std::chrono::high_resolution_clock::now();
   for (int i = 0; i < testset_size; i++) {
@@ -43,6 +39,7 @@ int main(int argc, char *argv[]) {
   std::cout << "Avg of " << delta.count() / testset_size << "us/msg"
             << std::endl;
   server_sender.terminate();
+  server_receiver.wait();
   pm.remove_pipe(pipe_name);
   return 0;
 }
