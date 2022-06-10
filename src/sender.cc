@@ -51,7 +51,6 @@ const void cppiper::Sender::sender(const std::string pipepath,
     lk.unlock();
     return;
   }
-  std::stringstream ss;
   spdlog::debug("Entering sender loop for pipe '{}'...", pipepath);
   while (true) {
     if (not(msg_ready or stop)) {
@@ -71,9 +70,9 @@ const void cppiper::Sender::sender(const std::string pipepath,
       lk.unlock();
       continue;
     }
+    std::stringstream ss;
     ss << std::setfill('0') << std::setw(8) << std::hex << buffer.size();
     retcode = write(pipe_fd, ss.str().c_str(), 8);
-    ss.flush();
     if (retcode == -1) {
       spdlog::error("Failed to send message size bytes over pipe '{}'",
                     pipepath);

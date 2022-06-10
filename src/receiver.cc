@@ -28,10 +28,10 @@ const void cppiper::Receiver::receiver(
     queue_lock.unlock();
     return;
   }
-  char hexbuffer[8]{};
-  std::stringstream ss;
+  char hexbuffer[8];
   int i;
   int bytes_read;
+  int msg_size;
   spdlog::debug("Entering receiver loop for pipe '{}'...", pipepath);
   while (true) {
     std::vector<char> buffer;
@@ -53,10 +53,9 @@ const void cppiper::Receiver::receiver(
     }
     queue_lock.lock();
     statuscode = 0;
-    int msg_size;
+    std::stringstream ss;
     ss << std::hex << hexbuffer;
     ss >> msg_size;
-    ss.flush();
     if (msg_size < 1) {
       statuscode = 3;
       spdlog::error("Parsed message size less than 1 ({0}) from pipe '{1}'",
@@ -72,8 +71,8 @@ const void cppiper::Receiver::receiver(
       continue;
     } else if (bytes_read != msg_size) {
       spdlog::error("Message bytes read from pipe '{}' did not match expected "
-                    "message size",
-                    pipepath);
+                    "message size, expected size: {}, bytes read: {}",
+                    pipepath, msg_size, bytes_read);
       statuscode = 5;
       continue;
     }
