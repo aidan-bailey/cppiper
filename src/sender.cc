@@ -55,6 +55,7 @@ const void cppiper::Sender::sender(const std::string pipepath,
   while (true) {
     if (not(msg_ready or stop)) {
       spdlog::debug("Waiting on sender request for pipe '{}'...", pipepath);
+      msg_conditional.notify_one();
       msg_conditional.wait(lk, [&]() { return msg_ready or stop; });
     }
     statuscode = 0;
@@ -127,8 +128,10 @@ const bool cppiper::Sender::send(const std::string msg) {
     buffer = msg;
     msg_ready = true;
   }
+  std::unique_lock lk(lock);
   msg_conditional.notify_one();
-  std::lock_guard lk(lock);
+  if (msg_ready)
+    msg_conditional.wait(lk, [&]() { return not msg_ready; });
   if (statuscode == 0)
     spdlog::info("Message sent on sender instance '{}'", name);
   else
