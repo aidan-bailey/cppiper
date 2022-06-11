@@ -29,11 +29,8 @@ cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
     return;
   }
   char hexbuffer[8];
-  int i;
   int bytes_read;
-  int msg_size;
-  int total_bytes_read;
-  int buffer_size(1024);
+  const int buffer_size(1024);
   spdlog::debug("Entering receiver loop for pipe '{}'...", pipepath);
   while (true) {
     spdlog::debug("Reading message size bytes from pipe '{}'...", pipepath);
@@ -56,6 +53,7 @@ cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
     statuscode = 0;
     std::stringstream ss;
     ss << std::hex << hexbuffer;
+    int msg_size;
     ss >> msg_size;
     if (msg_size < 1) {
       statuscode = 3;
@@ -65,7 +63,7 @@ cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
     }
     std::vector<char> subbuffer(msg_size);
     spdlog::debug("Reading message bytes from pipe '{}'...", pipepath);
-    total_bytes_read = 0;
+    int total_bytes_read(0);
     while ((bytes_read = read(
                 pipe_fd, &subbuffer.front() + total_bytes_read,
                 std::min(msg_size - total_bytes_read, buffer_size))) > 0 and

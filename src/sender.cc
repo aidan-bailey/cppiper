@@ -52,8 +52,8 @@ const void cppiper::Sender::sender(const std::string pipepath,
     return;
   }
   spdlog::debug("Entering sender loop for pipe '{}'...", pipepath);
-  const int buffering_size(1024);
   int bytes_written;
+  const int buffering_size(1024);
   while (true) {
     if (not(msg_ready or stop)) {
       spdlog::debug("Waiting on sender request for pipe '{}'...", pipepath);
@@ -86,7 +86,7 @@ const void cppiper::Sender::sender(const std::string pipepath,
     }
     spdlog::debug("Sent message size bytes over pipe '{}'", pipepath);
     spdlog::debug("Writing message over pipe '{}'...", pipepath);
-    const int msg_size = buffer.size();
+    const int msg_size(buffer.size());
     int total_bytes_written(0);
     while ((bytes_written = write(
                 pipe_fd, &buffer.front() + total_bytes_written,
