@@ -13,11 +13,11 @@
 #include <unistd.h>
 #include <vector>
 
-const void cppiper::Receiver::receiver(
-    const std::string pipepath, bool &msg_ready, int &statuscode,
-    std::queue<std::string> &msg_queue, std::mutex &queue_lock,
-    std::condition_variable &queue_condition) {
-  // std::lock_guard lk(queue_lock);
+const void
+cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
+                            int &statuscode, std::queue<std::string> &msg_queue,
+                            std::mutex &queue_lock,
+                            std::condition_variable &queue_condition) {
   spdlog::debug("Initialising receiver thread for '{}' pipe", pipepath);
   int retcode;
   spdlog::debug("Opening receiver end of pipe '{}'...", pipepath);
@@ -32,9 +32,10 @@ const void cppiper::Receiver::receiver(
   int i;
   int bytes_read;
   int msg_size;
+  int total_bytes_read;
+  int buffer_size(1024);
   spdlog::debug("Entering receiver loop for pipe '{}'...", pipepath);
   while (true) {
-    std::vector<char> buffer;
     spdlog::debug("Reading message size bytes from pipe '{}'...", pipepath);
     bytes_read = read(pipe_fd, hexbuffer, 8);
     if (bytes_read == -1) {
@@ -62,25 +63,25 @@ const void cppiper::Receiver::receiver(
                     msg_size, pipepath);
       continue;
     }
-    char subbuffer[msg_size];
+    std::vector<char> subbuffer(msg_size);
     spdlog::debug("Reading message bytes from pipe '{}'...", pipepath);
-    bytes_read = read(pipe_fd, subbuffer, msg_size);
+    total_bytes_read = 0;
+    while ((bytes_read = read(
+                pipe_fd, &subbuffer.front() + total_bytes_read,
+                std::min(msg_size - total_bytes_read, buffer_size))) > 0 and
+           (msg_size - (total_bytes_read += bytes_read) > 0))
+      ;
     if (bytes_read == -1) {
-      spdlog::error("Failed to read message bytes from pipe '{}'", pipepath);
-      statuscode = 4;
+      spdlog::error("Failed to read message bytes from pipe '{}', {}", pipepath,
+                    errno);
+      statuscode = errno;
       continue;
-    } else if (bytes_read != msg_size) {
-      spdlog::error("Message bytes read from pipe '{}' did not match expected "
-                    "message size, expected size: {}, bytes read: {}",
-                    pipepath, msg_size, bytes_read);
-      statuscode = 5;
-      continue;
+    } else if (bytes_read == 0) {
+      spdlog::debug("Breaking from receiver loop for pipe '{}'...", pipepath);
+      break;
     }
-
-    for (auto ptr = subbuffer; ptr < subbuffer + 8; ptr++)
-      buffer.push_back(*ptr);
     spdlog::debug("Received message over pipe '{}'", pipepath);
-    msg_queue.push(std::string(subbuffer, msg_size));
+    msg_queue.emplace(std::string(subbuffer.front(), subbuffer.back()));
     msg_ready = true;
     queue_lock.unlock();
     queue_condition.notify_one();
