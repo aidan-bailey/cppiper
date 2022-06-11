@@ -25,19 +25,20 @@ int main(int argc, char *argv[]) {
   std::string pipe_name = pm.make_pipe();
   cppiper::Sender server_sender("Server", pipe_name);
   cppiper::Receiver server_receiver("Client", pipe_name);
-  std::string msg = cppiper::random_hex(10000);
-  int testset_size = 1000000;
-  std::chrono::high_resolution_clock::time_point start =
-      std::chrono::high_resolution_clock::now();
+  std::string msg = cppiper::random_hex(1000000);
+  int testset_size = 100000;
+  double net = 0;
   for (int i = 0; i < testset_size; i++) {
+    std::chrono::high_resolution_clock::time_point start =
+        std::chrono::high_resolution_clock::now();
     server_sender.send(msg);
     server_receiver.receive(true);
+    std::chrono::high_resolution_clock::time_point end =
+        std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::micro> delta = (end - start);
+    net += delta.count();
   }
-  std::chrono::high_resolution_clock::time_point end =
-      std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double, std::micro> delta = (end - start);
-  std::cout << "Avg of " << delta.count() / testset_size << "us/msg"
-            << std::endl;
+  std::cout << "Avg of " << net / testset_size << "us/msg" << std::endl;
   server_sender.terminate();
   server_receiver.wait();
   pm.remove_pipe(pipe_name);
