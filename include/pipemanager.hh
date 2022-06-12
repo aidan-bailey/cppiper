@@ -21,10 +21,10 @@ std::string random_hex(int len);
  */
 class PipeManager {
 private:
-  //! Pipe directory path.
-  const std::string pipedir;
   //! Pipe directory lock.
   std::mutex lock;
+  //! Pipe directory path.
+  const std::string pipedir;
 
 public:
   //! Deleted.
