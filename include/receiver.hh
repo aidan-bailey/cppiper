@@ -62,13 +62,13 @@ public:
     \param wait block until a message is available.
     \return An optional that contains a message if one was available.
    */
-  const std::optional<const std::string> receive(bool wait);
+  std::optional<const std::string> receive(bool wait);
 
   //! Wait for communication line to be closed.
   /*!
     \return Whether or not the wait was successful.
    */
-  const bool wait(void);
+  bool wait(void);
 };
 
 } // namespace cppiper

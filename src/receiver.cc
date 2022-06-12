@@ -103,7 +103,7 @@ cppiper::Receiver::Receiver(const std::string name, const std::string pipepath)
                pipepath);
 }
 
-const std::optional<const std::string> cppiper::Receiver::receive(bool wait) {
+std::optional<const std::string> cppiper::Receiver::receive(bool wait) {
   std::unique_lock lk(queue_lock);
   spdlog::info("Trying to receive message on receiver instance '{}'", name);
   if (not msg_ready and wait) {
@@ -123,7 +123,7 @@ const std::optional<const std::string> cppiper::Receiver::receive(bool wait) {
   return msg;
 }
 
-const bool cppiper::Receiver::wait(void) {
+bool cppiper::Receiver::wait(void) {
   if (not thread.joinable()) {
     std::cerr << "Double termination for sender." << std::endl;
     return false;
