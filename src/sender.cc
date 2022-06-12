@@ -66,13 +66,6 @@ const void cppiper::Sender::sender(const std::string pipepath,
       break;
     }
     spdlog::debug("Send request received for pipe '{}'", pipepath);
-    if (buffer.empty()) {
-      spdlog::error("Attempt to send empty message over pipe '{}'", pipepath);
-      statuscode = 3;
-      msg_ready = false;
-      lk.unlock();
-      continue;
-    }
     std::stringstream ss;
     ss << std::setfill('0') << std::setw(8) << std::hex << buffer.size();
     retcode = write(pipe_fd, ss.str().c_str(), 8);
