@@ -63,20 +63,20 @@ public:
   /*!
     \return The current status code.
    */
-  const int get_status_code(void) const;
+  int get_status_code(void) const;
 
   //! Send a message over the pipe.
   /*!
     \param msg a message to send.
     \return Whether or not the send was successful.
    */
-  const bool send(const std::string &msg);
+  bool send(const std::string &msg);
 
   //! Terminate the pipe connection.
   /*!
    \return Whether or not the termination was successful.
    */
-  const bool terminate(void);
+  bool terminate(void);
 };
 
 } // namespace cppiper

@@ -116,9 +116,9 @@ cppiper::Sender::Sender(const std::string name, const std::string pipepath)
                pipepath);
 }
 
-const int cppiper::Sender::get_status_code(void) const { return statuscode; };
+int cppiper::Sender::get_status_code(void) const { return statuscode; };
 
-const bool cppiper::Sender::send(const std::string &msg) {
+bool cppiper::Sender::send(const std::string &msg) {
   spdlog::info("Sending message on sender instance '{}'", name);
   if (not thread.joinable() or stop) {
     spdlog::error(
@@ -142,7 +142,7 @@ const bool cppiper::Sender::send(const std::string &msg) {
   return statuscode == 0;
 }
 
-const bool cppiper::Sender::terminate(void) {
+bool cppiper::Sender::terminate(void) {
   spdlog::debug("Terminating sender instance '{}'...", name);
   if (not thread.joinable() or stop) {
     spdlog::warn("Double termination for sender instance '{}'", name);
