@@ -14,22 +14,22 @@ namespace cppiper {
 //! A class responsible for receiving messages.
 class Receiver {
 private:
-  //! Sender thread.
-  std::thread thread;
-  //! Conditional used to synchronise with the message queue.
-  std::condition_variable queue_condition;
-  //! Queue lock for the queue conditional.
-  std::mutex queue_lock;
-  //! Queue of received messages.
-  std::queue<std::string> msg_queue;
-  //! Flag used to signal message is ready to be received.
-  bool msg_ready;
-  //! Path to the receiver pipe.
-  const std::string pipepath;
   //! Identifying name of this receiver instance (for debugging).
   const std::string name;
+  //! Path to the receiver pipe.
+  const std::string pipepath;
+  //! Flag used to signal message is ready to be received.
+  bool msg_ready;
   //! Code representing current status of receiver thread.
   int statuscode;
+  //! Queue of received messages.
+  std::queue<std::string> msg_queue;
+  //! Queue lock for the queue conditional.
+  std::mutex queue_lock;
+  //! Conditional used to synchronise with the message queue.
+  std::condition_variable queue_condition;
+  //! Sender thread.
+  std::thread thread;
 
   //! Static method to be executed in the receiver thread.
   /*!
