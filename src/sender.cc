@@ -19,7 +19,7 @@
 #include <unistd.h>
 #include <vector>
 
-const void cppiper::Sender::sender(const std::string pipepath,
+void cppiper::Sender::sender(const std::string pipepath,
                                    const std::string **buffer, int &statuscode,
                                    bool &msg_ready, const bool &stop,
                                    std::mutex &lock,

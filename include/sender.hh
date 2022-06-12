@@ -43,7 +43,7 @@ private:
    \param lock reference to conditional lock.
    \param msg_conditional reference to conditional.
    */
-  const static void sender(const std::string pipepath, const std::string **buffer,
+  static void sender(const std::string pipepath, const std::string **buffer,
                            int &statuscode, bool &msg_ready, const bool &stop,
                            std::mutex &lock,
                            std::condition_variable &msg_conditional);
