@@ -25,7 +25,7 @@ private:
   //! Flag used to signal message is ready to be sent.
   bool msg_ready;
   //! Message buffer.
-  std::string buffer;
+  const std::string *buffer;
   //! Path to the sender pipe.
   const std::string pipepath;
   //! Identifying name of this sender instance (for debugging).
@@ -43,7 +43,7 @@ private:
    \param lock reference to conditional lock.
    \param msg_conditional reference to conditional.
    */
-  const static void sender(const std::string pipepath, std::string &buffer,
+  const static void sender(const std::string pipepath, const std::string **buffer,
                            int &statuscode, bool &msg_ready, const bool &stop,
                            std::mutex &lock,
                            std::condition_variable &msg_conditional);
@@ -70,7 +70,7 @@ public:
     \param msg a message to send.
     \return Whether or not the send was successful.
    */
-  const bool send(const std::string msg);
+  const bool send(const std::string &msg);
 
   //! Terminate the pipe connection.
   /*!

@@ -20,7 +20,7 @@
 #include <vector>
 
 const void cppiper::Sender::sender(const std::string pipepath,
-                                   std::string &buffer, int &statuscode,
+                                   const std::string **buffer, int &statuscode,
                                    bool &msg_ready, const bool &stop,
                                    std::mutex &lock,
                                    std::condition_variable &msg_conditional) {
@@ -67,7 +67,8 @@ const void cppiper::Sender::sender(const std::string pipepath,
     }
     spdlog::debug("Send request received for pipe '{}'", pipepath);
     std::stringstream ss;
-    ss << std::setfill('0') << std::setw(8) << std::hex << buffer.size();
+    const int msg_size((*buffer)->size());
+    ss << std::setfill('0') << std::setw(8) << std::hex << msg_size;
     retcode = write(pipe_fd, ss.str().c_str(), 8);
     if (retcode == -1) {
       spdlog::error("Failed to send message size bytes over pipe '{}'",
@@ -79,10 +80,9 @@ const void cppiper::Sender::sender(const std::string pipepath,
     }
     spdlog::debug("Sent message size bytes over pipe '{}'", pipepath);
     spdlog::debug("Writing message over pipe '{}'...", pipepath);
-    const int msg_size(buffer.size());
     int total_bytes_written(0);
     while ((bytes_written = write(
-                pipe_fd, &buffer.front() + total_bytes_written,
+                pipe_fd, &(*buffer)->front() + total_bytes_written,
                 std::min(msg_size - total_bytes_written, buffering_limit))) >
                0 and
            (msg_size - (total_bytes_written += bytes_written) > 0))
@@ -107,9 +107,9 @@ const void cppiper::Sender::sender(const std::string pipepath,
 }
 
 cppiper::Sender::Sender(const std::string name, const std::string pipepath)
-    : name(name), pipepath(pipepath), buffer(), statuscode(0), msg_ready(false),
+    : name(name), pipepath(pipepath), buffer(nullptr), statuscode(0), msg_ready(false),
       stop(false), lock(), msg_conditional(),
-      thread(sender, pipepath, std::ref(buffer), std::ref(statuscode),
+      thread(sender, pipepath, &buffer, std::ref(statuscode),
              std::ref(msg_ready), std::ref(stop), std::ref(lock),
              std::ref(msg_conditional)) {
   spdlog::info("Constructed sender instance '{0}' with pipe '{1}'", name,
@@ -118,7 +118,7 @@ cppiper::Sender::Sender(const std::string name, const std::string pipepath)
 
 const int cppiper::Sender::get_status_code(void) const { return statuscode; };
 
-const bool cppiper::Sender::send(const std::string msg) {
+const bool cppiper::Sender::send(const std::string &msg) {
   spdlog::info("Sending message on sender instance '{}'", name);
   if (not thread.joinable() or stop) {
     spdlog::error(
@@ -128,7 +128,7 @@ const bool cppiper::Sender::send(const std::string msg) {
   }
   {
     std::lock_guard lk(lock);
-    buffer = msg;
+    buffer = &msg;
     msg_ready = true;
   }
   std::unique_lock lk(lock);
