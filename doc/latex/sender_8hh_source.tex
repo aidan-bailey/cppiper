@@ -22,13 +22,13 @@
 \DoxyCodeLine{22   std::mutex lock;}
 \DoxyCodeLine{24   \textcolor{keywordtype}{bool} stop;}
 \DoxyCodeLine{26   \textcolor{keywordtype}{bool} msg\_ready;}
-\DoxyCodeLine{28   std::string buffer;}
+\DoxyCodeLine{28   \textcolor{keyword}{const} std::string *buffer;}
 \DoxyCodeLine{30   \textcolor{keyword}{const} std::string pipepath;}
 \DoxyCodeLine{32   \textcolor{keyword}{const} std::string name;}
 \DoxyCodeLine{34   \textcolor{keywordtype}{int} statuscode;}
 \DoxyCodeLine{35 }
 \DoxyCodeLine{37 }
-\DoxyCodeLine{46   \textcolor{keyword}{const} \textcolor{keyword}{static} \textcolor{keywordtype}{void} sender(\textcolor{keyword}{const} std::string pipepath, std::string \&buffer,}
+\DoxyCodeLine{46   \textcolor{keyword}{const} \textcolor{keyword}{static} \textcolor{keywordtype}{void} sender(\textcolor{keyword}{const} std::string pipepath, \textcolor{keyword}{const} std::string **buffer,}
 \DoxyCodeLine{47                            \textcolor{keywordtype}{int} \&statuscode, \textcolor{keywordtype}{bool} \&msg\_ready, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} \&stop,}
 \DoxyCodeLine{48                            std::mutex \&lock,}
 \DoxyCodeLine{49                            std::condition\_variable \&msg\_conditional);}
@@ -43,7 +43,7 @@
 \DoxyCodeLine{66   \textcolor{keyword}{const} \textcolor{keywordtype}{int} \mbox{\hyperlink{classcppiper_1_1Sender_a8c3bee391c77c476e65627f721ef27a6}{get\_status\_code}}(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};}
 \DoxyCodeLine{67 }
 \DoxyCodeLine{69 }
-\DoxyCodeLine{73   \textcolor{keyword}{const} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classcppiper_1_1Sender_a0525dbc3a645b284c35d9f0a3bdaf06f}{send}}(\textcolor{keyword}{const} std::string msg);}
+\DoxyCodeLine{73   \textcolor{keyword}{const} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classcppiper_1_1Sender_a8fdd2b8b8419878a18686833ed656c66}{send}}(\textcolor{keyword}{const} std::string \&msg);}
 \DoxyCodeLine{74 }
 \DoxyCodeLine{76 }
 \DoxyCodeLine{79   \textcolor{keyword}{const} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classcppiper_1_1Sender_a6de6b49e48ea58608e4a334fb4967361}{terminate}}(\textcolor{keywordtype}{void});}
