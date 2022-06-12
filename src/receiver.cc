@@ -78,8 +78,7 @@ cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
       spdlog::debug("Breaking from receiver loop for pipe '{}'...", pipepath);
       break;
     }
-    spdlog::debug("Received message over pipe '{}'", pipepath);
-    msg_queue.emplace(std::string(subbuffer.front(), subbuffer.back()));
+    msg_queue.emplace(std::string(&subbuffer.front(), msg_size));
     msg_ready = true;
     queue_lock.unlock();
     queue_condition.notify_one();
