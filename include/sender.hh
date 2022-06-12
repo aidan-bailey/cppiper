@@ -14,24 +14,24 @@ namespace cppiper {
 //! A class responsible for sending messages.
 class Sender {
 private:
-  //! Sender thread.
-  std::thread thread;
-  //! Conditional used to synchronise with the thread.
-  std::condition_variable msg_conditional;
-  //! Lock utilised by conditional.
-  std::mutex lock;
-  //! Flag used to stop thread.
-  bool stop;
-  //! Flag used to signal message is ready to be sent.
-  bool msg_ready;
-  //! Message buffer.
-  const std::string *buffer;
-  //! Path to the sender pipe.
-  const std::string pipepath;
   //! Identifying name of this sender instance (for debugging).
   const std::string name;
+  //! Path to the sender pipe.
+  const std::string pipepath;
+  //! Message buffer.
+  const std::string *buffer;
   //! Code representing current status of sender thread.
   int statuscode;
+  //! Flag used to signal message is ready to be sent.
+  bool msg_ready;
+  //! Flag used to stop thread.
+  bool stop;
+  //! Lock utilised by conditional.
+  std::mutex lock;
+  //! Conditional used to synchronise with the thread.
+  std::condition_variable msg_conditional;
+  //! Sender thread.
+  std::thread thread;
 
   //! Static method to be executed in the sender thread.
   /*!
