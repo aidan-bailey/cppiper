@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <vector>
 
-const void
+void
 cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
                             int &statuscode, std::queue<std::string> &msg_queue,
                             std::mutex &queue_lock,

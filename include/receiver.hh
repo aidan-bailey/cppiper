@@ -40,7 +40,7 @@ private:
     \param queue_lock reference to queue conditional lock.
     \param queue_condition reference to queue conditional.
    */
-  const static void receiver(const std::string pipepath, bool &msg_ready,
+  static void receiver(const std::string pipepath, bool &msg_ready,
                              int &statuscode,
                              std::queue<std::string> &msg_queue,
                              std::mutex &queue_lock,
