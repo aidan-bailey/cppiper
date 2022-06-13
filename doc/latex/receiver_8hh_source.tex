@@ -17,17 +17,17 @@
 \DoxyCodeLine{13 }
 \DoxyCodeLine{15 \textcolor{keyword}{class }\mbox{\hyperlink{classcppiper_1_1Receiver}{Receiver}} \{}
 \DoxyCodeLine{16 \textcolor{keyword}{private}:}
-\DoxyCodeLine{18   std::thread thread;}
-\DoxyCodeLine{20   std::condition\_variable queue\_condition;}
-\DoxyCodeLine{22   std::mutex queue\_lock;}
-\DoxyCodeLine{24   std::queue<std::string> msg\_queue;}
-\DoxyCodeLine{26   \textcolor{keywordtype}{bool} msg\_ready;}
-\DoxyCodeLine{28   \textcolor{keyword}{const} std::string pipepath;}
-\DoxyCodeLine{30   \textcolor{keyword}{const} std::string name;}
-\DoxyCodeLine{32   \textcolor{keywordtype}{int} statuscode;}
+\DoxyCodeLine{18   \textcolor{keyword}{const} std::string name;}
+\DoxyCodeLine{20   \textcolor{keyword}{const} std::string pipepath;}
+\DoxyCodeLine{22   \textcolor{keywordtype}{bool} msg\_ready;}
+\DoxyCodeLine{24   \textcolor{keywordtype}{int} statuscode;}
+\DoxyCodeLine{26   std::queue<std::string> msg\_queue;}
+\DoxyCodeLine{28   std::mutex queue\_lock;}
+\DoxyCodeLine{30   std::condition\_variable queue\_condition;}
+\DoxyCodeLine{32   std::thread thread;}
 \DoxyCodeLine{33 }
 \DoxyCodeLine{35 }
-\DoxyCodeLine{43   \textcolor{keyword}{const} \textcolor{keyword}{static} \textcolor{keywordtype}{void} receiver(\textcolor{keyword}{const} std::string pipepath, \textcolor{keywordtype}{bool} \&msg\_ready,}
+\DoxyCodeLine{43   \textcolor{keyword}{static} \textcolor{keywordtype}{void} receiver(\textcolor{keyword}{const} std::string pipepath, \textcolor{keywordtype}{bool} \&msg\_ready,}
 \DoxyCodeLine{44                              \textcolor{keywordtype}{int} \&statuscode,}
 \DoxyCodeLine{45                              std::queue<std::string> \&msg\_queue,}
 \DoxyCodeLine{46                              std::mutex \&queue\_lock,}
@@ -40,14 +40,18 @@
 \DoxyCodeLine{58   \mbox{\hyperlink{classcppiper_1_1Receiver_a0b250284bb2a39e21e2b968f72173336}{Receiver}}(\textcolor{keyword}{const} std::string name, \textcolor{keyword}{const} std::string pipepath);}
 \DoxyCodeLine{59 }
 \DoxyCodeLine{61 }
-\DoxyCodeLine{65   \textcolor{keyword}{const} std::optional<const std::string> \mbox{\hyperlink{classcppiper_1_1Receiver_af0aaeeec23f2db411a785d198331c44a}{receive}}(\textcolor{keywordtype}{bool} \mbox{\hyperlink{classcppiper_1_1Receiver_ae92edc76ef399d9f9ab76952de1d056c}{wait}});}
+\DoxyCodeLine{65   std::optional<const std::string> \mbox{\hyperlink{classcppiper_1_1Receiver_a483b1c598ea5f14b8e819f3faa6f4df7}{receive}}(\textcolor{keywordtype}{bool} \mbox{\hyperlink{classcppiper_1_1Receiver_a4f89a1616a6d57c86cf8031e487e9915}{wait}});}
 \DoxyCodeLine{66 }
 \DoxyCodeLine{68 }
-\DoxyCodeLine{71   \textcolor{keyword}{const} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classcppiper_1_1Receiver_ae92edc76ef399d9f9ab76952de1d056c}{wait}}(\textcolor{keywordtype}{void});}
-\DoxyCodeLine{72 \};}
-\DoxyCodeLine{73 }
-\DoxyCodeLine{74 \} \textcolor{comment}{// namespace cppiper}}
-\DoxyCodeLine{75 }
-\DoxyCodeLine{76 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// RECEIVER\_HH\_}}
+\DoxyCodeLine{71   \textcolor{keywordtype}{bool} \mbox{\hyperlink{classcppiper_1_1Receiver_a4f89a1616a6d57c86cf8031e487e9915}{wait}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{74 }
+\DoxyCodeLine{77   std::string \mbox{\hyperlink{classcppiper_1_1Receiver_a97ef78a8690ca83cc5835b14adc93683}{get\_pipe}}(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79 \};}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81 \} \textcolor{comment}{// namespace cppiper}}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// RECEIVER\_HH\_}}
 
 \end{DoxyCode}

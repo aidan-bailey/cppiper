@@ -17,18 +17,18 @@
 \DoxyCodeLine{13 }
 \DoxyCodeLine{15 \textcolor{keyword}{class }\mbox{\hyperlink{classcppiper_1_1Sender}{Sender}} \{}
 \DoxyCodeLine{16 \textcolor{keyword}{private}:}
-\DoxyCodeLine{18   std::thread thread;}
-\DoxyCodeLine{20   std::condition\_variable msg\_conditional;}
-\DoxyCodeLine{22   std::mutex lock;}
-\DoxyCodeLine{24   \textcolor{keywordtype}{bool} stop;}
+\DoxyCodeLine{18   \textcolor{keyword}{const} std::string name;}
+\DoxyCodeLine{20   \textcolor{keyword}{const} std::string pipepath;}
+\DoxyCodeLine{22   \textcolor{keyword}{const} std::string *buffer;}
+\DoxyCodeLine{24   \textcolor{keywordtype}{int} statuscode;}
 \DoxyCodeLine{26   \textcolor{keywordtype}{bool} msg\_ready;}
-\DoxyCodeLine{28   \textcolor{keyword}{const} std::string *buffer;}
-\DoxyCodeLine{30   \textcolor{keyword}{const} std::string pipepath;}
-\DoxyCodeLine{32   \textcolor{keyword}{const} std::string name;}
-\DoxyCodeLine{34   \textcolor{keywordtype}{int} statuscode;}
+\DoxyCodeLine{28   \textcolor{keywordtype}{bool} stop;}
+\DoxyCodeLine{30   std::mutex lock;}
+\DoxyCodeLine{32   std::condition\_variable msg\_conditional;}
+\DoxyCodeLine{34   std::thread thread;}
 \DoxyCodeLine{35 }
 \DoxyCodeLine{37 }
-\DoxyCodeLine{46   \textcolor{keyword}{const} \textcolor{keyword}{static} \textcolor{keywordtype}{void} sender(\textcolor{keyword}{const} std::string pipepath, \textcolor{keyword}{const} std::string **buffer,}
+\DoxyCodeLine{46   \textcolor{keyword}{static} \textcolor{keywordtype}{void} sender(\textcolor{keyword}{const} std::string pipepath, \textcolor{keyword}{const} std::string **buffer,}
 \DoxyCodeLine{47                            \textcolor{keywordtype}{int} \&statuscode, \textcolor{keywordtype}{bool} \&msg\_ready, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} \&stop,}
 \DoxyCodeLine{48                            std::mutex \&lock,}
 \DoxyCodeLine{49                            std::condition\_variable \&msg\_conditional);}
@@ -40,17 +40,20 @@
 \DoxyCodeLine{60   \mbox{\hyperlink{classcppiper_1_1Sender_a08eb5bf4912af33e0629c05cdfc45d32}{Sender}}(\textcolor{keyword}{const} std::string name, \textcolor{keyword}{const} std::string pipepath);}
 \DoxyCodeLine{61 }
 \DoxyCodeLine{63 }
-\DoxyCodeLine{66   \textcolor{keyword}{const} \textcolor{keywordtype}{int} \mbox{\hyperlink{classcppiper_1_1Sender_a8c3bee391c77c476e65627f721ef27a6}{get\_status\_code}}(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};}
+\DoxyCodeLine{66   \textcolor{keywordtype}{int} \mbox{\hyperlink{classcppiper_1_1Sender_af2c3d20c0808ee5fd25f860272ccd5f7}{get\_status\_code}}(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};}
 \DoxyCodeLine{67 }
 \DoxyCodeLine{69 }
-\DoxyCodeLine{73   \textcolor{keyword}{const} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classcppiper_1_1Sender_a8fdd2b8b8419878a18686833ed656c66}{send}}(\textcolor{keyword}{const} std::string \&msg);}
+\DoxyCodeLine{73   \textcolor{keywordtype}{bool} \mbox{\hyperlink{classcppiper_1_1Sender_a48d2cd671545259eca74586a66690351}{send}}(\textcolor{keyword}{const} std::string \&msg);}
 \DoxyCodeLine{74 }
 \DoxyCodeLine{76 }
-\DoxyCodeLine{79   \textcolor{keyword}{const} \textcolor{keywordtype}{bool} \mbox{\hyperlink{classcppiper_1_1Sender_a6de6b49e48ea58608e4a334fb4967361}{terminate}}(\textcolor{keywordtype}{void});}
-\DoxyCodeLine{80 \};}
-\DoxyCodeLine{81 }
-\DoxyCodeLine{82 \} \textcolor{comment}{// namespace cppiper}}
-\DoxyCodeLine{83 }
-\DoxyCodeLine{84 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// SENDER\_HH\_}}
+\DoxyCodeLine{79   \textcolor{keywordtype}{bool} \mbox{\hyperlink{classcppiper_1_1Sender_a101e0aaa89ee07121a1b73fb74eab425}{terminate}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{82 }
+\DoxyCodeLine{85   std::string \mbox{\hyperlink{classcppiper_1_1Sender_aeafa58f9a75151ddf7750e7d80137bda}{get\_pipe}}(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};}
+\DoxyCodeLine{86 \};}
+\DoxyCodeLine{87 }
+\DoxyCodeLine{88 \} \textcolor{comment}{// namespace cppiper}}
+\DoxyCodeLine{89 }
+\DoxyCodeLine{90 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// SENDER\_HH\_}}
 
 \end{DoxyCode}

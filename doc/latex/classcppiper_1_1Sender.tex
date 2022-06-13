@@ -17,12 +17,14 @@ A class responsible for sending messages.
 \begin{DoxyCompactList}\small\item\em Deleted. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classcppiper_1_1Sender_a08eb5bf4912af33e0629c05cdfc45d32}{Sender}} (const std\+::string name, const std\+::string pipepath)
 \begin{DoxyCompactList}\small\item\em Construct a sender. \end{DoxyCompactList}\item 
-const int \mbox{\hyperlink{classcppiper_1_1Sender_a8c3bee391c77c476e65627f721ef27a6}{get\+\_\+status\+\_\+code}} (void) const
+int \mbox{\hyperlink{classcppiper_1_1Sender_af2c3d20c0808ee5fd25f860272ccd5f7}{get\+\_\+status\+\_\+code}} (void) const
 \begin{DoxyCompactList}\small\item\em Get the sender thread\textquotesingle{}s current status code. \end{DoxyCompactList}\item 
-const bool \mbox{\hyperlink{classcppiper_1_1Sender_a8fdd2b8b8419878a18686833ed656c66}{send}} (const std\+::string \&msg)
+bool \mbox{\hyperlink{classcppiper_1_1Sender_a48d2cd671545259eca74586a66690351}{send}} (const std\+::string \&msg)
 \begin{DoxyCompactList}\small\item\em Send a message over the pipe. \end{DoxyCompactList}\item 
-const bool \mbox{\hyperlink{classcppiper_1_1Sender_a6de6b49e48ea58608e4a334fb4967361}{terminate}} (void)
-\begin{DoxyCompactList}\small\item\em Terminate the pipe connection. \end{DoxyCompactList}\end{DoxyCompactItemize}
+bool \mbox{\hyperlink{classcppiper_1_1Sender_a101e0aaa89ee07121a1b73fb74eab425}{terminate}} (void)
+\begin{DoxyCompactList}\small\item\em Terminate the pipe connection. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{classcppiper_1_1Sender_aeafa58f9a75151ddf7750e7d80137bda}{get\+\_\+pipe}} (void) const
+\begin{DoxyCompactList}\small\item\em Get the pipe path. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \doxysubsection{Detailed Description}
@@ -49,11 +51,24 @@ Construct a sender.
 
 
 \doxysubsection{Member Function Documentation}
-\mbox{\Hypertarget{classcppiper_1_1Sender_a8c3bee391c77c476e65627f721ef27a6}\label{classcppiper_1_1Sender_a8c3bee391c77c476e65627f721ef27a6}} 
+\mbox{\Hypertarget{classcppiper_1_1Sender_aeafa58f9a75151ddf7750e7d80137bda}\label{classcppiper_1_1Sender_aeafa58f9a75151ddf7750e7d80137bda}} 
+\index{cppiper::Sender@{cppiper::Sender}!get\_pipe@{get\_pipe}}
+\index{get\_pipe@{get\_pipe}!cppiper::Sender@{cppiper::Sender}}
+\doxysubsubsection{\texorpdfstring{get\_pipe()}{get\_pipe()}}
+{\footnotesize\ttfamily std\+::string cppiper\+::\+Sender\+::get\+\_\+pipe (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption}) const}
+
+
+
+Get the pipe path. 
+
+\begin{DoxyReturn}{Returns}
+Pipe path. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classcppiper_1_1Sender_af2c3d20c0808ee5fd25f860272ccd5f7}\label{classcppiper_1_1Sender_af2c3d20c0808ee5fd25f860272ccd5f7}} 
 \index{cppiper::Sender@{cppiper::Sender}!get\_status\_code@{get\_status\_code}}
 \index{get\_status\_code@{get\_status\_code}!cppiper::Sender@{cppiper::Sender}}
 \doxysubsubsection{\texorpdfstring{get\_status\_code()}{get\_status\_code()}}
-{\footnotesize\ttfamily const int cppiper\+::\+Sender\+::get\+\_\+status\+\_\+code (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption}) const}
+{\footnotesize\ttfamily int cppiper\+::\+Sender\+::get\+\_\+status\+\_\+code (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption}) const}
 
 
 
@@ -62,11 +77,11 @@ Get the sender thread\textquotesingle{}s current status code.
 \begin{DoxyReturn}{Returns}
 The current status code. 
 \end{DoxyReturn}
-\mbox{\Hypertarget{classcppiper_1_1Sender_a8fdd2b8b8419878a18686833ed656c66}\label{classcppiper_1_1Sender_a8fdd2b8b8419878a18686833ed656c66}} 
+\mbox{\Hypertarget{classcppiper_1_1Sender_a48d2cd671545259eca74586a66690351}\label{classcppiper_1_1Sender_a48d2cd671545259eca74586a66690351}} 
 \index{cppiper::Sender@{cppiper::Sender}!send@{send}}
 \index{send@{send}!cppiper::Sender@{cppiper::Sender}}
 \doxysubsubsection{\texorpdfstring{send()}{send()}}
-{\footnotesize\ttfamily const bool cppiper\+::\+Sender\+::send (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{msg }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily bool cppiper\+::\+Sender\+::send (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{msg }\end{DoxyParamCaption})}
 
 
 
@@ -80,11 +95,11 @@ Send a message over the pipe.
 \begin{DoxyReturn}{Returns}
 Whether or not the send was successful. 
 \end{DoxyReturn}
-\mbox{\Hypertarget{classcppiper_1_1Sender_a6de6b49e48ea58608e4a334fb4967361}\label{classcppiper_1_1Sender_a6de6b49e48ea58608e4a334fb4967361}} 
+\mbox{\Hypertarget{classcppiper_1_1Sender_a101e0aaa89ee07121a1b73fb74eab425}\label{classcppiper_1_1Sender_a101e0aaa89ee07121a1b73fb74eab425}} 
 \index{cppiper::Sender@{cppiper::Sender}!terminate@{terminate}}
 \index{terminate@{terminate}!cppiper::Sender@{cppiper::Sender}}
 \doxysubsubsection{\texorpdfstring{terminate()}{terminate()}}
-{\footnotesize\ttfamily const bool cppiper\+::\+Sender\+::terminate (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily bool cppiper\+::\+Sender\+::terminate (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
 
 
 

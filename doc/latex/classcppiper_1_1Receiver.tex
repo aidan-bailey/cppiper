@@ -17,10 +17,12 @@ A class responsible for receiving messages.
 \begin{DoxyCompactList}\small\item\em Deleted. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classcppiper_1_1Receiver_a0b250284bb2a39e21e2b968f72173336}{Receiver}} (const std\+::string name, const std\+::string pipepath)
 \begin{DoxyCompactList}\small\item\em Construct a receiver. \end{DoxyCompactList}\item 
-const std\+::optional$<$ const std\+::string $>$ \mbox{\hyperlink{classcppiper_1_1Receiver_af0aaeeec23f2db411a785d198331c44a}{receive}} (bool \mbox{\hyperlink{classcppiper_1_1Receiver_ae92edc76ef399d9f9ab76952de1d056c}{wait}})
+std\+::optional$<$ const std\+::string $>$ \mbox{\hyperlink{classcppiper_1_1Receiver_a483b1c598ea5f14b8e819f3faa6f4df7}{receive}} (bool \mbox{\hyperlink{classcppiper_1_1Receiver_a4f89a1616a6d57c86cf8031e487e9915}{wait}})
 \begin{DoxyCompactList}\small\item\em Receive a message. \end{DoxyCompactList}\item 
-const bool \mbox{\hyperlink{classcppiper_1_1Receiver_ae92edc76ef399d9f9ab76952de1d056c}{wait}} (void)
-\begin{DoxyCompactList}\small\item\em Wait for communication line to be closed. \end{DoxyCompactList}\end{DoxyCompactItemize}
+bool \mbox{\hyperlink{classcppiper_1_1Receiver_a4f89a1616a6d57c86cf8031e487e9915}{wait}} (void)
+\begin{DoxyCompactList}\small\item\em Wait for communication line to be closed. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{classcppiper_1_1Receiver_a97ef78a8690ca83cc5835b14adc93683}{get\+\_\+pipe}} (void) const
+\begin{DoxyCompactList}\small\item\em Get the pipe path. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \doxysubsection{Detailed Description}
@@ -47,11 +49,24 @@ Construct a receiver.
 
 
 \doxysubsection{Member Function Documentation}
-\mbox{\Hypertarget{classcppiper_1_1Receiver_af0aaeeec23f2db411a785d198331c44a}\label{classcppiper_1_1Receiver_af0aaeeec23f2db411a785d198331c44a}} 
+\mbox{\Hypertarget{classcppiper_1_1Receiver_a97ef78a8690ca83cc5835b14adc93683}\label{classcppiper_1_1Receiver_a97ef78a8690ca83cc5835b14adc93683}} 
+\index{cppiper::Receiver@{cppiper::Receiver}!get\_pipe@{get\_pipe}}
+\index{get\_pipe@{get\_pipe}!cppiper::Receiver@{cppiper::Receiver}}
+\doxysubsubsection{\texorpdfstring{get\_pipe()}{get\_pipe()}}
+{\footnotesize\ttfamily std\+::string cppiper\+::\+Receiver\+::get\+\_\+pipe (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption}) const}
+
+
+
+Get the pipe path. 
+
+\begin{DoxyReturn}{Returns}
+Pipe path. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classcppiper_1_1Receiver_a483b1c598ea5f14b8e819f3faa6f4df7}\label{classcppiper_1_1Receiver_a483b1c598ea5f14b8e819f3faa6f4df7}} 
 \index{cppiper::Receiver@{cppiper::Receiver}!receive@{receive}}
 \index{receive@{receive}!cppiper::Receiver@{cppiper::Receiver}}
 \doxysubsubsection{\texorpdfstring{receive()}{receive()}}
-{\footnotesize\ttfamily const std\+::optional$<$ const std\+::string $>$ cppiper\+::\+Receiver\+::receive (\begin{DoxyParamCaption}\item[{bool}]{wait }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily std\+::optional$<$ const std\+::string $>$ cppiper\+::\+Receiver\+::receive (\begin{DoxyParamCaption}\item[{bool}]{wait }\end{DoxyParamCaption})}
 
 
 
@@ -65,11 +80,11 @@ Receive a message.
 \begin{DoxyReturn}{Returns}
 An optional that contains a message if one was available. 
 \end{DoxyReturn}
-\mbox{\Hypertarget{classcppiper_1_1Receiver_ae92edc76ef399d9f9ab76952de1d056c}\label{classcppiper_1_1Receiver_ae92edc76ef399d9f9ab76952de1d056c}} 
+\mbox{\Hypertarget{classcppiper_1_1Receiver_a4f89a1616a6d57c86cf8031e487e9915}\label{classcppiper_1_1Receiver_a4f89a1616a6d57c86cf8031e487e9915}} 
 \index{cppiper::Receiver@{cppiper::Receiver}!wait@{wait}}
 \index{wait@{wait}!cppiper::Receiver@{cppiper::Receiver}}
 \doxysubsubsection{\texorpdfstring{wait()}{wait()}}
-{\footnotesize\ttfamily const bool cppiper\+::\+Receiver\+::wait (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily bool cppiper\+::\+Receiver\+::wait (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
 
 
 

@@ -84,17 +84,17 @@ $(function() {
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="classcppiper_1_1Receiver.html">   15</a></span><span class="keyword">class </span><a class="code hl_class" href="classcppiper_1_1Receiver.html">Receiver</a> {</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>  std::thread thread;</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  std::condition_variable queue_condition;</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>  std::mutex queue_lock;</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>  std::queue&lt;std::string&gt; msg_queue;</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  <span class="keywordtype">bool</span> msg_ready;</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  <span class="keyword">const</span> std::string pipepath;</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  <span class="keyword">const</span> std::string name;</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>  <span class="keywordtype">int</span> statuscode;</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>  <span class="keyword">const</span> std::string name;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  <span class="keyword">const</span> std::string pipepath;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>  <span class="keywordtype">bool</span> msg_ready;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>  <span class="keywordtype">int</span> statuscode;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  std::queue&lt;std::string&gt; msg_queue;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  std::mutex queue_lock;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  std::condition_variable queue_condition;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>  std::thread thread;</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>  <span class="keyword">const</span> <span class="keyword">static</span> <span class="keywordtype">void</span> receiver(<span class="keyword">const</span> std::string pipepath, <span class="keywordtype">bool</span> &amp;msg_ready,</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>  <span class="keyword">static</span> <span class="keywordtype">void</span> receiver(<span class="keyword">const</span> std::string pipepath, <span class="keywordtype">bool</span> &amp;msg_ready,</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>                             <span class="keywordtype">int</span> &amp;statuscode,</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>                             std::queue&lt;std::string&gt; &amp;msg_queue,</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>                             std::mutex &amp;queue_lock,</div>
@@ -107,20 +107,25 @@ $(function() {
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="classcppiper_1_1Receiver.html#a0b250284bb2a39e21e2b968f72173336">   58</a></span>  <a class="code hl_function" href="classcppiper_1_1Receiver.html#a0b250284bb2a39e21e2b968f72173336">Receiver</a>(<span class="keyword">const</span> std::string name, <span class="keyword">const</span> std::string pipepath);</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno"><a class="line" href="classcppiper_1_1Receiver.html#af0aaeeec23f2db411a785d198331c44a">   65</a></span>  <span class="keyword">const</span> std::optional&lt;const std::string&gt; <a class="code hl_function" href="classcppiper_1_1Receiver.html#af0aaeeec23f2db411a785d198331c44a">receive</a>(<span class="keywordtype">bool</span> <a class="code hl_function" href="classcppiper_1_1Receiver.html#ae92edc76ef399d9f9ab76952de1d056c">wait</a>);</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno"><a class="line" href="classcppiper_1_1Receiver.html#a483b1c598ea5f14b8e819f3faa6f4df7">   65</a></span>  std::optional&lt;const std::string&gt; <a class="code hl_function" href="classcppiper_1_1Receiver.html#a483b1c598ea5f14b8e819f3faa6f4df7">receive</a>(<span class="keywordtype">bool</span> <a class="code hl_function" href="classcppiper_1_1Receiver.html#a4f89a1616a6d57c86cf8031e487e9915">wait</a>);</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno"><a class="line" href="classcppiper_1_1Receiver.html#ae92edc76ef399d9f9ab76952de1d056c">   71</a></span>  <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classcppiper_1_1Receiver.html#ae92edc76ef399d9f9ab76952de1d056c">wait</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>};</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>} <span class="comment">// namespace cppiper</span></div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="preprocessor">#endif </span><span class="comment">// RECEIVER_HH_</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno"><a class="line" href="classcppiper_1_1Receiver.html#a4f89a1616a6d57c86cf8031e487e9915">   71</a></span>  <span class="keywordtype">bool</span> <a class="code hl_function" href="classcppiper_1_1Receiver.html#a4f89a1616a6d57c86cf8031e487e9915">wait</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="classcppiper_1_1Receiver.html#a97ef78a8690ca83cc5835b14adc93683">   77</a></span>  std::string <a class="code hl_function" href="classcppiper_1_1Receiver.html#a97ef78a8690ca83cc5835b14adc93683">get_pipe</a>(<span class="keywordtype">void</span>) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>};</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>} <span class="comment">// namespace cppiper</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="preprocessor">#endif </span><span class="comment">// RECEIVER_HH_</span></div>
 <div class="ttc" id="aclasscppiper_1_1Receiver_html"><div class="ttname"><a href="classcppiper_1_1Receiver.html">cppiper::Receiver</a></div><div class="ttdoc">A class responsible for receiving messages.</div><div class="ttdef"><b>Definition:</b> receiver.hh:15</div></div>
 <div class="ttc" id="aclasscppiper_1_1Receiver_html_a0b250284bb2a39e21e2b968f72173336"><div class="ttname"><a href="classcppiper_1_1Receiver.html#a0b250284bb2a39e21e2b968f72173336">cppiper::Receiver::Receiver</a></div><div class="ttdeci">Receiver(const std::string name, const std::string pipepath)</div><div class="ttdoc">Construct a receiver.</div></div>
+<div class="ttc" id="aclasscppiper_1_1Receiver_html_a483b1c598ea5f14b8e819f3faa6f4df7"><div class="ttname"><a href="classcppiper_1_1Receiver.html#a483b1c598ea5f14b8e819f3faa6f4df7">cppiper::Receiver::receive</a></div><div class="ttdeci">std::optional&lt; const std::string &gt; receive(bool wait)</div><div class="ttdoc">Receive a message.</div></div>
+<div class="ttc" id="aclasscppiper_1_1Receiver_html_a4f89a1616a6d57c86cf8031e487e9915"><div class="ttname"><a href="classcppiper_1_1Receiver.html#a4f89a1616a6d57c86cf8031e487e9915">cppiper::Receiver::wait</a></div><div class="ttdeci">bool wait(void)</div><div class="ttdoc">Wait for communication line to be closed.</div></div>
 <div class="ttc" id="aclasscppiper_1_1Receiver_html_a74513e50e55ecacd92f9783679496f2f"><div class="ttname"><a href="classcppiper_1_1Receiver.html#a74513e50e55ecacd92f9783679496f2f">cppiper::Receiver::Receiver</a></div><div class="ttdeci">Receiver(void)=delete</div><div class="ttdoc">Deleted.</div></div>
-<div class="ttc" id="aclasscppiper_1_1Receiver_html_ae92edc76ef399d9f9ab76952de1d056c"><div class="ttname"><a href="classcppiper_1_1Receiver.html#ae92edc76ef399d9f9ab76952de1d056c">cppiper::Receiver::wait</a></div><div class="ttdeci">const bool wait(void)</div><div class="ttdoc">Wait for communication line to be closed.</div></div>
-<div class="ttc" id="aclasscppiper_1_1Receiver_html_af0aaeeec23f2db411a785d198331c44a"><div class="ttname"><a href="classcppiper_1_1Receiver.html#af0aaeeec23f2db411a785d198331c44a">cppiper::Receiver::receive</a></div><div class="ttdeci">const std::optional&lt; const std::string &gt; receive(bool wait)</div><div class="ttdoc">Receive a message.</div></div>
+<div class="ttc" id="aclasscppiper_1_1Receiver_html_a97ef78a8690ca83cc5835b14adc93683"><div class="ttname"><a href="classcppiper_1_1Receiver.html#a97ef78a8690ca83cc5835b14adc93683">cppiper::Receiver::get_pipe</a></div><div class="ttdeci">std::string get_pipe(void) const</div><div class="ttdoc">Get the pipe path.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
