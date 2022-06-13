@@ -69,6 +69,13 @@ public:
     \return Whether or not the wait was successful.
    */
   bool wait(void);
+
+  //! Get the pipe path.
+  /*!
+    \return Pipe path.
+   */
+  std::string get_pipe(void) const;
+
 };
 
 } // namespace cppiper

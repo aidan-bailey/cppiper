@@ -77,6 +77,12 @@ public:
    \return Whether or not the termination was successful.
    */
   bool terminate(void);
+
+  //! Get the pipe path.
+  /*!
+    \return Pipe path.
+   */
+  std::string get_pipe(void) const;
 };
 
 } // namespace cppiper

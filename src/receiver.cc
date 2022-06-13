@@ -131,3 +131,8 @@ bool cppiper::Receiver::wait(void) {
   thread.join();
   return true;
 }
+
+
+std::string cppiper::Receiver::get_pipe(void) const {
+  return pipepath;
+}

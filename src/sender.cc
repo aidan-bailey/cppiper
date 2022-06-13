@@ -158,3 +158,7 @@ bool cppiper::Sender::terminate(void) {
   spdlog::info("Terminated sender instance '{}'", name);
   return true;
 }
+
+std::string cppiper::Sender::get_pipe(void) const {
+  return pipepath;
+}
