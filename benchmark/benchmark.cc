@@ -17,11 +17,11 @@ using namespace std::string_literals;
 
 int main(int argc, char *argv[]) {
   if (argc < 3){
-    std::cout << "usage: benchmark <msg_size> <msg_count>" << std::endl;
+    std::cout << "usage: benchmark <msg_count> <msg_size>" << std::endl;
     exit(1);
   }
-  const int msg_size(atoi(argv[1]));
-  const int msg_count(atoi(argv[2]));
+  const int msg_count(atoi(argv[1]));
+  const int msg_size(atoi(argv[2]));
   std::cout << "cppiper v" << CPPIPER_VERSION_MAJOR << '.'
             << CPPIPER_VERSION_MINOR << std::endl;
   fLS::FLAGS_log_dir = "./";
