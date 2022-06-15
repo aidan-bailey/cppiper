@@ -4,7 +4,7 @@ Named pipe ipc library (WIP).
 ## Requirements
 - `C++17` capable compiler
 - [cmake](https://cmake.org/)
-- [spdlog](https://github.com/gabime/spdlog) for logging
+- [glog](https://github.com/google/glog) for logging
 - [doxygen](https://www.doxygen.nl/) for docs
 
 ## Building
