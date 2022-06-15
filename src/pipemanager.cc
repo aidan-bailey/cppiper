@@ -1,7 +1,7 @@
 #include "../include/pipemanager.hh"
 #include <filesystem>
+#include <glog/logging.h>
 #include <mutex>
-#include <spdlog/spdlog.h>
 #include <string>
 #include <sys/stat.h>
 
@@ -17,43 +17,44 @@ std::string cppiper::random_hex(int len) {
 cppiper::PipeManager::PipeManager(std::string pipedir)
     : lock(), pipedir(pipedir) {
   if (not std::filesystem::exists(pipedir)) {
-    spdlog::debug("Creating pipe directory '{}'...", pipedir);
+    DLOG(INFO) << "Creating pipe directory " << pipedir << "..." << std::endl;
     std::filesystem::create_directories(pipedir);
   }
-  spdlog::info("Constructed pipe manager for pipe directory '{}'", pipedir);
+  DLOG(INFO) << "Constructed pipe manager for pipe directory " << pipedir
+             << std::endl;
 }
 
 std::string cppiper::PipeManager::make_pipe(void) {
   std::string pipepath;
   std::lock_guard lk(lock);
   while (std::filesystem::exists(pipepath = pipedir + "/" + random_hex(32))) {
-    spdlog::debug("Pipe miss at '{}'", pipepath);
+    DLOG(INFO) << "Pipe miss at " << pipepath << std::endl;
   };
   mkfifo(pipepath.c_str(), 00666);
-  spdlog::debug("New pipe created at '{}'", pipepath);
+  DLOG(INFO) << "New pipe created at " << pipepath << std::endl;
   return pipepath;
 }
 
 bool cppiper::PipeManager::remove_pipe(std::string pipepath) {
-    std::lock_guard lk(lock);
-    if (not std::filesystem::exists(pipepath)){
-        spdlog::error("Failed to remove pipe at '{}' as it does not exist", pipepath);
-        return false;
-    }
-    std::filesystem::remove(pipepath);
-    spdlog::debug("Removed pipe at '{}'", pipepath);
-    return true;
+  std::lock_guard lk(lock);
+  if (not std::filesystem::exists(pipepath)) {
+    LOG(WARNING) << "Failed to remove pipe at " << pipepath
+                 << " as it does not exist" << std::endl;
+    return false;
+  }
+  std::filesystem::remove(pipepath);
+  DLOG(INFO) << "Removed pipe at " << pipepath << std::endl;
+  return true;
 };
 
 void cppiper::PipeManager::clear(void) {
-  spdlog::debug("Clearing pipes...");
-  if (not std::filesystem::exists(pipedir))
-    spdlog::error("Attempt to clear non-existent pipe directory '{}'",
-                 pipedir);
-  else {
+  DLOG(INFO) << "Clearing pipes..." << std::endl;
+  if (not std::filesystem::exists(pipedir)) {
+    LOG(ERROR) << "Attempt to clear non-existent pipe directory " << pipedir << std::endl;
+  } else {
     for (const auto &entry : std::filesystem::directory_iterator(pipedir)) {
       std::filesystem::remove(entry.path());
-      spdlog::debug("Removed pipe at '{}'", entry.path().string());
+      DLOG(INFO) << "Removed pipe at " << entry.path().string() << std::endl;
     }
   }
 }
