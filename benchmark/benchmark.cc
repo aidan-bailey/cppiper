@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     std::chrono::duration<double, std::micro> delta = (end - start);
     net += delta.count();
   }
-  std::cout << "Avg of " << net / testset_size << "us/msg" << std::endl;
+  std::cout << "Result: " << net / testset_size << "us/msg" << std::endl;
   server_sender.terminate();
   server_receiver.wait();
   pm.remove_pipe(pipe_name);
