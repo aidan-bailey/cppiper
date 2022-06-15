@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(CPPIPER)
 
 option(DEV "Generate compiler commands and set logging to debug." OFF)
+option(DOC "Generate documentation." OFF)
 
 set(CPPIPER_VERSION_MAJOR 0)
 set(CPPIPER_VERSION_MINOR 1)
@@ -21,15 +22,21 @@ endif()
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 configure_file(src/cppiperconfig.hh.in cppiperconfig.hh)
 
 include(GenerateExportHeader)
 
+########################
+# LIBRARY DECLARATIONS #
+########################
+
+# Dependencies
 find_package (glog REQUIRED)
 
-add_library(cppiper STATIC src/pipemanager.cc  src/receiver.cc src/sender.cc)
+# Dynamic Lib
+add_library(cppiper SHARED src/pipemanager.cc  src/receiver.cc src/sender.cc)
 target_link_libraries(cppiper PRIVATE glog::glog)
 generate_export_header(cppiper)
 set_property(TARGET cppiper PROPERTY VERSION ${CPPIPER_VERSION})
@@ -40,6 +47,21 @@ set_property(TARGET cppiper PROPERTY VERSION ${CPPIPER_VERSION})
 #  COMPATIBLE_INTERFACE_STRING CPPIPER_MAJOR_VERSION
 #)
 
+# Static Lib
+add_library(cppiper_static STATIC src/pipemanager.cc  src/receiver.cc src/sender.cc)
+target_link_libraries(cppiper_static PRIVATE glog::glog)
+generate_export_header(cppiper_static)
+set_property(TARGET cppiper_static PROPERTY VERSION ${CPPIPER_VERSION})
+#set_property(TARGET cppiper_static PROPERTY SOVERSION 3)
+#set_property(TARGET cppiper_static PROPERTY
+#  INTERFACE_CPPIPER_MAJOR_VERSION 3)
+#set_property(TARGET cppiper_static APPEND PROPERTY
+#  COMPATIBLE_INTERFACE_STRING CPPIPER_MAJOR_VERSION
+#)
+
+################
+# INSTALLATION #
+################
 
 install(TARGETS cppiper EXPORT cppiper-targets
   LIBRARY DESTINATION lib
@@ -47,6 +69,14 @@ install(TARGETS cppiper EXPORT cppiper-targets
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include
 )
+
+install(TARGETS cppiper_static EXPORT cppiper-targets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
 install(
   FILES
     include/pipemanager.hh
@@ -101,9 +131,12 @@ target_include_directories(benchmark PUBLIC
                            "${PROJECT_BINARY_DIR}"
                            include
                            )
-target_link_libraries(benchmark PUBLIC cppiper)
+target_link_libraries(benchmark PUBLIC cppiper_static)
 
-option(DOC "Build documentation" OFF)
+##################
+# DOC GENERATION #
+##################
+
 if (DOC)
   find_package(Doxygen)
   if (DOXYGEN_FOUND)
