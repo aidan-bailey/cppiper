@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
   std::cout << "cppiper v" << CPPIPER_VERSION_MAJOR << '.'
             << CPPIPER_VERSION_MINOR << " benchmark" << std::endl
             << "Message Count: " << msg_count << std::endl
-            << "Message Size: " << msg_size << "B" << std::endl;
+            << "Message Size:  " << msg_size << "B" << std::endl;
   fLS::FLAGS_log_dir = "./";
   google::InitGoogleLogging(argv[0]);
   cppiper::PipeManager pm("pipemanager");
@@ -34,6 +34,7 @@ int main(int argc, char *argv[]) {
   const std::string msg = cppiper::random_hex(msg_size);
   const int testset_size = msg_count;
   double net = 0;
+  std::cout << "running..." << std::endl;
   for (int i = 0; i < testset_size; i++) {
     std::chrono::high_resolution_clock::time_point start =
         std::chrono::high_resolution_clock::now();
@@ -44,6 +45,7 @@ int main(int argc, char *argv[]) {
     std::chrono::duration<double, std::micro> delta = (end - start);
     net += delta.count();
   }
+  std::cout << "finished" << std::endl;
   std::cout << "Result: " << net / testset_size << "us/msg" << std::endl;
   server_sender.terminate();
   server_receiver.wait();
