@@ -29,6 +29,6 @@ sudo cmake --install .
 A benchmark executable, `benchmark`, will be built along with the library. This doubles as an example of usage, the source code of which can be found in the *benchmark* directory.
 
 ## TODO
-- [ ] cppiper dynamic lib
+- [x] cppiper dynamic lib
 - [ ] proper testing using [cache2](https://github.com/catchorg/Catch2)
 - [ ] garbage collector for pipe manager
