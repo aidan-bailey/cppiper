@@ -3,27 +3,29 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <glog/logging.h>
 #include <iostream>
 #include <istream>
 #include <mutex>
-#include <spdlog/spdlog.h>
 #include <sys/stat.h>
 #include <thread>
 #include <tuple>
 #include <unistd.h>
 #include <vector>
 
-void
-cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
-                            int &statuscode, std::queue<std::string> &msg_queue,
-                            std::mutex &queue_lock,
-                            std::condition_variable &queue_condition) {
-  spdlog::debug("Initialising receiver thread for '{}' pipe", pipepath);
+void cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
+                                 int &statuscode,
+                                 std::queue<std::string> &msg_queue,
+                                 std::mutex &queue_lock,
+                                 std::condition_variable &queue_condition) {
+  DLOG(INFO) << "Initialising receiver thread for " << pipepath << " pipe"
+             << std::endl;
   int retcode;
-  spdlog::debug("Opening receiver end of pipe '{}'...", pipepath);
+  DLOG(INFO) << "Opening receiver end of pipe " << pipepath << "..."
+             << std::endl;
   const int pipe_fd = open(pipepath.c_str(), O_RDONLY);
   if (pipe_fd == -1) {
-    spdlog::error("Failed to open receiver pipe '{}'", pipepath);
+    LOG(ERROR) << "Failed to open receiver pipe " << pipepath << std::endl;
     statuscode = 1;
     queue_lock.unlock();
     return;
@@ -31,22 +33,25 @@ cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
   char hexbuffer[8];
   int bytes_read;
   const int buffering_limit(65536);
-  spdlog::debug("Entering receiver loop for pipe '{}'...", pipepath);
+  DLOG(INFO) << "Entering receiver loop for pipe " << pipepath << "..."
+             << std::endl;
   while (true) {
-    spdlog::debug("Reading message size bytes from pipe '{}'...", pipepath);
+    DLOG(INFO) << "Reading message size bytes from pipe " << pipepath << "..."
+               << std::endl;
     bytes_read = read(pipe_fd, hexbuffer, 8);
     if (bytes_read == -1) {
-      spdlog::error("Failed to read size bytes from pipe '{}'", pipepath);
-      statuscode = 1;
+      LOG(ERROR) << "Failed to read size bytes from pipe " << pipepath
+                 << std::endl;
+      statuscode = errno;
       continue;
     } else if (bytes_read == 0) {
-      spdlog::debug("Breaking from receiver loop for pipe '{}'...", pipepath);
+      DLOG(INFO) << "Breaking from receiver loop for pipe " << pipepath
+                 << std::endl;
       break;
     } else if (bytes_read != 8) {
-      spdlog::error(
-          "Read an unexpected number of message size bytes from pipe '{}'",
-          pipepath);
-      statuscode = 2;
+      LOG(ERROR) << "Read an unexpected number of message size bytes from pipe "
+                 << pipepath << std::endl;
+      statuscode = errno;
       break;
     }
     queue_lock.lock();
@@ -56,13 +61,14 @@ cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
     int msg_size;
     ss >> msg_size;
     if (msg_size < 1) {
-      statuscode = 3;
-      spdlog::error("Parsed message size less than 1 ({0}) from pipe '{1}'",
-                    msg_size, pipepath);
+      LOG(ERROR) << "Parsed message size less than 1 (" << msg_size
+                 << ") from pipe " << pipepath << std::endl;
+      statuscode = errno;
       continue;
     }
     std::vector<char> subbuffer(msg_size);
-    spdlog::debug("Reading message bytes from pipe '{}'...", pipepath);
+    DLOG(INFO) << "Reading message bytes from pipe " << pipepath << "..."
+               << std::endl;
     int total_bytes_read(0);
     while ((bytes_read = read(
                 pipe_fd, &subbuffer.front() + total_bytes_read,
@@ -70,12 +76,13 @@ cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
            (msg_size - (total_bytes_read += bytes_read) > 0))
       ;
     if (bytes_read == -1) {
-      spdlog::error("Failed to read message bytes from pipe '{}', {}", pipepath,
-                    errno);
+      LOG(ERROR) << "Failed to read message bytes from pipe " << pipepath
+                 << std::endl;
       statuscode = errno;
       continue;
     } else if (bytes_read == 0) {
-      spdlog::debug("Breaking from receiver loop for pipe '{}'...", pipepath);
+      DLOG(INFO) << "Breaking from receiver loop for pipe " << pipepath
+                 << std::endl;
       break;
     }
     msg_queue.emplace(std::string(&subbuffer.front(), msg_size));
@@ -85,10 +92,12 @@ cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
   }
   retcode = close(pipe_fd);
   if (retcode == -1) {
-    spdlog::error("Failed to close receiver end for pipe '{}'", pipepath);
-    statuscode = 6;
-  } else
-    spdlog::debug("Closed receiver end for pipe '{}'", pipepath);
+    LOG(ERROR) << "Failed to close receiver end for pipe " << pipepath
+               << std::endl;
+    statuscode = errno;
+  } else {
+    DLOG(INFO) << "Closed receiver end for pipe " << pipepath << std::endl;
+  }
   queue_lock.unlock();
   queue_condition.notify_one();
 }
@@ -99,15 +108,15 @@ cppiper::Receiver::Receiver(const std::string name, const std::string pipepath)
       thread(receiver, pipepath, std::ref(msg_ready), std::ref(statuscode),
              std::ref(msg_queue), std::ref(queue_lock),
              std::ref(queue_condition)) {
-  spdlog::info("Constructed receiver instance '{0}' with pipe '{1}'", name,
-               pipepath);
+  LOG(INFO) << "Constructed receiver instance " << name << " for pipe "
+            << pipepath << std::endl;
 }
 
 std::optional<const std::string> cppiper::Receiver::receive(bool wait) {
   std::unique_lock lk(queue_lock);
-  spdlog::info("Trying to receive message on receiver instance '{}'", name);
+  DLOG(INFO) << "Trying to receive message on receiver instance " << name << std::endl;
   if (not msg_ready and wait) {
-    spdlog::debug("Waiting to receive message on receiver instance '{}'", name);
+    DLOG(INFO) << "Waiting to receive message on receiver instance " << name << std::endl;
     queue_condition.wait(lk, [this] { return msg_ready; });
   }
   if (msg_queue.empty()) {
@@ -119,20 +128,16 @@ std::optional<const std::string> cppiper::Receiver::receive(bool wait) {
   if (msg_queue.empty())
     msg_ready = false;
   lk.unlock();
-  spdlog::info("Returning received message from receiver instance '{}'", name);
+  DLOG(INFO) << "Returning received message from receiver instance " << name << std::endl;
   return msg;
 }
 
 bool cppiper::Receiver::wait(void) {
   if (not thread.joinable()) {
-    std::cerr << "Double termination for sender." << std::endl;
-    return false;
+    return true;
   }
   thread.join();
   return true;
 }
 
-
-std::string cppiper::Receiver::get_pipe(void) const {
-  return pipepath;
-}
+std::string cppiper::Receiver::get_pipe(void) const { return pipepath; }
