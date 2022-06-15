@@ -16,6 +16,12 @@
 using namespace std::string_literals;
 
 int main(int argc, char *argv[]) {
+  if (argc < 3){
+    std::cout << "usage: benchmark <msg_size> <msg_count>" << std::endl;
+    exit(1);
+  }
+  const int msg_size(atoi(argv[1]));
+  const int msg_count(atoi(argv[2]));
   std::cout << "cppiper v" << CPPIPER_VERSION_MAJOR << '.'
             << CPPIPER_VERSION_MINOR << std::endl;
   fLS::FLAGS_log_dir = "./";
@@ -24,8 +30,8 @@ int main(int argc, char *argv[]) {
   std::string pipe_name = pm.make_pipe();
   cppiper::Sender server_sender("Server", pipe_name);
   cppiper::Receiver server_receiver("Client", pipe_name);
-  std::string msg = cppiper::random_hex(128);
-  int testset_size = 100000;
+  const std::string msg = cppiper::random_hex(msg_size);
+  const int testset_size = msg_count;
   double net = 0;
   for (int i = 0; i < testset_size; i++) {
     std::chrono::high_resolution_clock::time_point start =
