@@ -10,22 +10,21 @@
 #include <string>
 #include <thread>
 #include <tuple>
+#include <glog/logging.h>
+
 
 using namespace std::string_literals;
 
 int main(int argc, char *argv[]) {
   std::cout << "cppiper v" << CPPIPER_VERSION_MAJOR << '.'
             << CPPIPER_VERSION_MINOR << std::endl;
-  if (DEV) {
-    spdlog::set_level(spdlog::level::debug);
-    spdlog::debug("Dev mode enabled");
-  } else
-    spdlog::set_level(spdlog::level::err);
+  fLS::FLAGS_log_dir = "./";
+  google::InitGoogleLogging(argv[0]);
   cppiper::PipeManager pm("pipemanager");
   std::string pipe_name = pm.make_pipe();
   cppiper::Sender server_sender("Server", pipe_name);
   cppiper::Receiver server_receiver("Client", pipe_name);
-  std::string msg = cppiper::random_hex(1000000);
+  std::string msg = cppiper::random_hex(128);
   int testset_size = 100000;
   double net = 0;
   for (int i = 0; i < testset_size; i++) {

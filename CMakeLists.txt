@@ -27,11 +27,10 @@ configure_file(src/cppiperconfig.hh.in cppiperconfig.hh)
 
 include(GenerateExportHeader)
 
-find_package(spdlog REQUIRED) # logging
 find_package (glog REQUIRED)
 
 add_library(cppiper STATIC src/pipemanager.cc  src/receiver.cc src/sender.cc)
-target_link_libraries(cppiper PRIVATE spdlog::spdlog glog::glog)
+target_link_libraries(cppiper PRIVATE glog::glog)
 generate_export_header(cppiper)
 set_property(TARGET cppiper PROPERTY VERSION ${CPPIPER_VERSION})
 #set_property(TARGET cppiper PROPERTY SOVERSION 3)
