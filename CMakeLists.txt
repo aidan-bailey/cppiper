@@ -126,6 +126,10 @@ install(
     Devel
 )
 
+########################
+# BENCHMARK EXECUTABLE #
+########################
+
 add_executable(benchmark benchmark/benchmark.cc)
 target_include_directories(benchmark PUBLIC
                            "${PROJECT_BINARY_DIR}"
