@@ -28,9 +28,9 @@ int main(int argc, char *argv[]) {
   fLS::FLAGS_log_dir = "./";
   google::InitGoogleLogging(argv[0]);
   cppiper::PipeManager pm("pipemanager");
-  std::string pipe_name = pm.make_pipe();
-  cppiper::Sender server_sender("Server", pipe_name);
-  cppiper::Receiver server_receiver("Client", pipe_name);
+  std::filesystem::path pipepath = pm.make_pipe();
+  cppiper::Sender server_sender("Server", pipepath);
+  cppiper::Receiver server_receiver("Client", pipepath);
   const std::string msg = cppiper::random_hex(msg_size);
   const int testset_size = msg_count;
   double net = 0;
@@ -49,6 +49,6 @@ int main(int argc, char *argv[]) {
   std::cout << "Result: " << net / testset_size << "us/msg" << std::endl;
   server_sender.terminate();
   server_receiver.wait();
-  pm.remove_pipe(pipe_name);
+  pm.remove_pipe(pipepath.filename());
   return 0;
 }
