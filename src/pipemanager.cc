@@ -17,11 +17,11 @@ std::string cppiper::random_hex(int len) {
 
 cppiper::PipeManager::PipeManager(const std::filesystem::path pipedir)
     : lock(), pipedir(std::filesystem::absolute(pipedir)) {
-  if (not std::filesystem::exists(pipedir)) {
-    DLOG(INFO) << "Creating pipe directory " << pipedir << "...";
+  if (not std::filesystem::exists(this->pipedir)) {
+    DLOG(INFO) << "Creating pipe directory " << this->pipedir << "...";
     std::filesystem::create_directories(pipedir);
   }
-  DLOG(INFO) << "Constructed pipe manager for pipe directory " << pipedir;
+  LOG(INFO) << "Constructed pipe manager for directory " << this->pipedir;
 }
 
 std::filesystem::path cppiper::PipeManager::make_pipe(void) {
@@ -39,9 +39,9 @@ std::filesystem::path cppiper::PipeManager::make_pipe(void) {
 
 bool cppiper::PipeManager::remove_pipe(const std::string pipename) {
   std::lock_guard lk(lock);
-  const std::filesystem::path pipepath(pipedir.string() + pipename);
+  const std::filesystem::path pipepath(pipedir.string() + std::filesystem::path::preferred_separator + pipename);
   if (not std::filesystem::exists(pipepath)) {
-    LOG(WARNING) << "Pipe " << pipename << " does not exist";
+    LOG(WARNING) << "Pipe " << pipepath << " does not exist";
     return false;
   }
   std::filesystem::remove(pipepath);
