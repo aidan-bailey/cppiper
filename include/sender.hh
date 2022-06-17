@@ -1,5 +1,6 @@
 #ifndef SENDER_HH_
 #define SENDER_HH_
+#include <filesystem>
 #include <condition_variable>
 #include <memory>
 #include <mutex>
@@ -15,7 +16,7 @@ private:
   //! Identifying name of this sender instance (for debugging).
   const std::string name;
   //! Path to the sender pipe.
-  const std::string pipepath;
+  const std::filesystem::path pipepath;
   //! Message buffer.
   const std::string *buffer;
   //! Code representing current status of sender thread.
@@ -41,7 +42,7 @@ private:
    \param lock reference to conditional lock.
    \param msg_conditional reference to conditional.
    */
-  static void sender(const std::string pipepath, const std::string **buffer,
+  static void sender(const std::filesystem::path pipepath, const std::string **buffer,
                            int &statuscode, bool &msg_ready, const bool &stop,
                            std::mutex &lock,
                            std::condition_variable &msg_conditional);
@@ -55,7 +56,7 @@ public:
     \param name identifying name of this sender instance (for debugging).
     \param pipepath path to the sender pipe.
    */
-  Sender(const std::string name, const std::string pipepath);
+  Sender(const std::string name, const std::filesystem::path pipepath);
 
   //! Get the sender thread's current status code.
   /*!
@@ -80,7 +81,7 @@ public:
   /*!
     \return Pipe path.
    */
-  std::string get_pipe(void) const;
+  std::filesystem::path get_pipe(void) const;
 };
 
 } // namespace cppiper

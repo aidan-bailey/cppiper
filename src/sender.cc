@@ -18,8 +18,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <vector>
+#include <filesystem>
 
-void cppiper::Sender::sender(const std::string pipepath,
+void cppiper::Sender::sender(const std::filesystem::path pipepath,
                              const std::string **buffer, int &statuscode,
                              bool &msg_ready, const bool &stop,
                              std::mutex &lock,
@@ -109,14 +110,14 @@ void cppiper::Sender::sender(const std::string pipepath,
   lk.unlock();
 }
 
-cppiper::Sender::Sender(const std::string name, const std::string pipepath)
-    : name(name), pipepath(pipepath), buffer(nullptr), statuscode(0),
+cppiper::Sender::Sender(const std::string name, const std::filesystem::path pipepath)
+    : name(name), pipepath(std::filesystem::absolute(pipepath)), buffer(nullptr), statuscode(0),
       msg_ready(false), stop(false), lock(), msg_conditional(),
-      thread(sender, pipepath, &buffer, std::ref(statuscode),
+      thread(sender, this->pipepath, &buffer, std::ref(statuscode),
              std::ref(msg_ready), std::ref(stop), std::ref(lock),
              std::ref(msg_conditional)) {
   LOG(INFO) << "Constructed sender instance " << name << " with pipe "
-            << pipepath;
+            << this->pipepath;
 }
 
 int cppiper::Sender::get_status_code(void) const { return statuscode; };
@@ -161,4 +162,4 @@ bool cppiper::Sender::terminate(void) {
   return true;
 }
 
-std::string cppiper::Sender::get_pipe(void) const { return pipepath; }
+std::filesystem::path cppiper::Sender::get_pipe(void) const { return pipepath; }
