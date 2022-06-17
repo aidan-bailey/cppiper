@@ -159,6 +159,7 @@ bool cppiper::Sender::terminate(void) {
   DLOG(INFO) << "Joining thread for sender instance " << name << "...";
   thread.join();
   DLOG(INFO) << "Joined thread for sender instance " << name;
+  LOG(INFO) << "Terminated sender instance " << name;
   return true;
 }
 

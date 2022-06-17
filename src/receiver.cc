@@ -19,9 +19,10 @@ void cppiper::Receiver::receiver(const std::filesystem::path pipepath, bool &msg
                                  std::queue<std::string> &msg_queue,
                                  std::mutex &queue_lock,
                                  std::condition_variable &queue_condition) {
-  DLOG(INFO) << "Initialising receiver thread for pipe " << pipepath;
+  const std::string & pipename = pipepath.filename();
+  DLOG(INFO) << "Initialising receiver thread for pipe " << pipename;
   int retcode;
-  DLOG(INFO) << "Opening receiver end of pipe " << pipepath << "...";
+  DLOG(INFO) << "Opening receiver end of pipe " << pipename << "...";
   const int pipe_fd = open(pipepath.c_str(), O_RDONLY);
   if (pipe_fd == -1) {
     LOG(ERROR) << "Failed to open receiver pipe " << pipepath << ", " << errno;
@@ -32,21 +33,21 @@ void cppiper::Receiver::receiver(const std::filesystem::path pipepath, bool &msg
   char hexbuffer[8];
   int bytes_read;
   const int buffering_limit(65536);
-  DLOG(INFO) << "Entering receiver loop for pipe " << pipepath << "...";
+  DLOG(INFO) << "Entering receiver loop for pipe " << pipename << "...";
   while (true) {
-    DLOG(INFO) << "Reading message size bytes from pipe " << pipepath << "...";
+    DLOG(INFO) << "Reading message size bytes from pipe " << pipename << "...";
     bytes_read = read(pipe_fd, hexbuffer, 8);
     if (bytes_read == -1) {
-      LOG(ERROR) << "Failed to read size bytes from pipe " << pipepath << ", "
+      LOG(ERROR) << "Failed to read size bytes from pipe " << pipename << ", "
                  << errno;
       statuscode = errno;
       continue;
     } else if (bytes_read == 0) {
-      DLOG(INFO) << "Breaking from receiver loop for pipe " << pipepath;
+      DLOG(INFO) << "Breaking from receiver loop for pipe " << pipename;
       break;
     } else if (bytes_read != 8) {
       LOG(ERROR) << "Read an unexpected number of message size bytes from pipe "
-                 << pipepath << ", " << errno;
+                 << pipename << ", " << errno;
       statuscode = errno;
       break;
     }
@@ -58,12 +59,12 @@ void cppiper::Receiver::receiver(const std::filesystem::path pipepath, bool &msg
     ss >> msg_size;
     if (msg_size < 1) {
       LOG(ERROR) << "Parsed message size less than 1 (" << msg_size
-                 << ") from pipe " << pipepath << ", " << errno;
+                 << ") from pipe " << pipename << ", " << errno;
       statuscode = errno;
       continue;
     }
     std::vector<char> subbuffer(msg_size);
-    DLOG(INFO) << "Reading message bytes from pipe " << pipepath << "...";
+    DLOG(INFO) << "Reading message bytes from pipe " << pipename << "...";
     int total_bytes_read(0);
     while ((bytes_read = read(
                 pipe_fd, &subbuffer.front() + total_bytes_read,
@@ -71,12 +72,12 @@ void cppiper::Receiver::receiver(const std::filesystem::path pipepath, bool &msg
            (msg_size - (total_bytes_read += bytes_read) > 0))
       ;
     if (bytes_read == -1) {
-      LOG(ERROR) << "Failed to read message bytes from pipe " << pipepath
+      LOG(ERROR) << "Failed to read message bytes from pipe " << pipename
                  << ", " << errno;
       statuscode = errno;
       continue;
     } else if (bytes_read == 0) {
-      DLOG(INFO) << "Breaking from receiver loop for pipe " << pipepath;
+      DLOG(INFO) << "Breaking from receiver loop for pipe " << pipename;
       break;
     }
     msg_queue.emplace(std::string(&subbuffer.front(), msg_size));
@@ -86,11 +87,11 @@ void cppiper::Receiver::receiver(const std::filesystem::path pipepath, bool &msg
   }
   retcode = close(pipe_fd);
   if (retcode == -1) {
-    LOG(ERROR) << "Failed to close receiver end for pipe " << pipepath << ", "
+    LOG(ERROR) << "Failed to close receiver end of pipe " << pipename << ", "
                << errno;
     statuscode = errno;
   } else {
-    DLOG(INFO) << "Closed receiver end for pipe " << pipepath;
+    DLOG(INFO) << "Closed receiver end of pipe " << pipename;
   }
   queue_lock.unlock();
   queue_condition.notify_one();
@@ -103,7 +104,7 @@ cppiper::Receiver::Receiver(const std::string name, const std::filesystem::path 
              std::ref(msg_queue), std::ref(queue_lock),
              std::ref(queue_condition)) {
   LOG(INFO) << "Constructed receiver instance " << name << " with pipe "
-            << pipepath;
+            << pipepath.filename();
 }
 
 std::optional<const std::string> cppiper::Receiver::receive(bool wait) {
@@ -133,6 +134,7 @@ bool cppiper::Receiver::wait(void) {
   DLOG(INFO) << "Joining thread for receiver instance " << name << "...";
   thread.join();
   DLOG(INFO) << "Joined thread for receiver instance " << name;
+  LOG(INFO) << "Cleaned up receiver instance " << name;
   return true;
 }
 
