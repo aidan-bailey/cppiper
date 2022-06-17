@@ -8,6 +8,8 @@
 
 namespace cppiper {
 
+const size_t PIPE_LENGTH = 32;
+
 //! Generate a random hex string of a specified length.
 /*!
   \param len a specified length.
@@ -42,14 +44,14 @@ public:
   /*!
     \return The path to the pipe.
   */
-  std::string make_pipe(void);
+  std::filesystem::path make_pipe(void);
 
   //! Remove a pipe from the pipe directory.
   /*!
-    \param pipepath path to the pipe.
+    \param pipename name of pipe.
     \return whether or not the removal was successful.
   */
-  bool remove_pipe(const std::filesystem::path pipepath);
+  bool remove_pipe(const std::string pipename);
 
   //! Clear the pipe directory of pipes.
   void clear(void);

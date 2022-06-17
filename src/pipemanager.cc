@@ -16,7 +16,7 @@ std::string cppiper::random_hex(int len) {
 }
 
 cppiper::PipeManager::PipeManager(const std::filesystem::path pipedir)
-    : lock(), pipedir(pipedir) {
+    : lock(), pipedir(std::filesystem::absolute(pipedir)) {
   if (not std::filesystem::exists(pipedir)) {
     DLOG(INFO) << "Creating pipe directory " << pipedir << "...";
     std::filesystem::create_directories(pipedir);
@@ -24,10 +24,12 @@ cppiper::PipeManager::PipeManager(const std::filesystem::path pipedir)
   DLOG(INFO) << "Constructed pipe manager for pipe directory " << pipedir;
 }
 
-std::string cppiper::PipeManager::make_pipe(void) {
-  std::string pipepath;
+std::filesystem::path cppiper::PipeManager::make_pipe(void) {
+  std::filesystem::path pipepath;
   std::lock_guard lk(lock);
-  while (std::filesystem::exists(pipepath = pipedir + "/" + random_hex(32))) {
+  while (std::filesystem::exists(
+      pipepath = pipedir.string() + std::filesystem::path::preferred_separator +
+                 random_hex(PIPE_LENGTH))) {
     DLOG(INFO) << "Pipe miss at " << pipepath;
   };
   mkfifo(pipepath.c_str(), 00666);
@@ -35,15 +37,15 @@ std::string cppiper::PipeManager::make_pipe(void) {
   return pipepath;
 }
 
-bool cppiper::PipeManager::remove_pipe(const std::filesystem::path pipepath) {
+bool cppiper::PipeManager::remove_pipe(const std::string pipename) {
   std::lock_guard lk(lock);
+  const std::filesystem::path pipepath(pipedir.string() + pipename);
   if (not std::filesystem::exists(pipepath)) {
-    LOG(WARNING) << "Failed to remove pipe at " << pipepath
-                 << " as it does not exist";
+    LOG(WARNING) << "Pipe " << pipename << " does not exist";
     return false;
   }
   std::filesystem::remove(pipepath);
-  DLOG(INFO) << "Removed pipe at " << pipepath;
+  DLOG(INFO) << "Removed pipe " << pipename;
   return true;
 };
 
