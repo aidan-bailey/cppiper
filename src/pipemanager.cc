@@ -50,6 +50,7 @@ bool cppiper::PipeManager::remove_pipe(const std::string pipename) {
 };
 
 void cppiper::PipeManager::clear(void) {
+  std::lock_guard lk(lock);
   DLOG(INFO) << "Clearing pipes...";
   if (not std::filesystem::exists(pipedir)) {
     LOG(ERROR) << "Attempt to clear non-existent pipe directory " << pipedir
