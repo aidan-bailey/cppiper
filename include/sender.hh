@@ -3,8 +3,6 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
-#include <spdlog/logger.h>
-#include <spdlog/spdlog.h>
 #include <string>
 #include <thread>
 #include <vector>
