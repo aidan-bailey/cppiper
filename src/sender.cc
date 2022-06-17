@@ -25,8 +25,9 @@ void cppiper::Sender::sender(const std::filesystem::path pipepath,
                              bool &msg_ready, const bool &stop,
                              std::mutex &lock,
                              std::condition_variable &msg_conditional) {
+  const std::string & pipename = pipepath.filename();
   std::unique_lock lk(lock);
-  DLOG(INFO) << "Initialising sender thread for pipe " << pipepath;
+  DLOG(INFO) << "Initialising sender thread for pipe " << pipename;
   int retcode;
   if (not std::filesystem::exists(pipepath)) {
     DLOG(INFO) << "Pipe " << pipepath << " does not exist, creating...";
@@ -53,35 +54,35 @@ void cppiper::Sender::sender(const std::filesystem::path pipepath,
     lk.unlock();
     return;
   }
-  DLOG(INFO) << "Entering sender loop for pipe " << pipepath << "...";
+  DLOG(INFO) << "Entering sender loop for pipe " << pipename << "...";
   int bytes_written;
   const int buffering_limit(65536);
   while (true) {
     if (not(msg_ready or stop)) {
-      DLOG(INFO) << "Waiting on sender request for pipe " << pipepath << "...";
+      DLOG(INFO) << "Waiting on sender request for pipe " << pipename << "...";
       msg_conditional.notify_one();
       msg_conditional.wait(lk, [&]() { return msg_ready or stop; });
     }
     statuscode = 0;
     if (stop) {
-      DLOG(INFO) << "Breaking from sender loop for pipe " << pipepath;
+      DLOG(INFO) << "Breaking from sender loop for pipe " << pipename;
       break;
     }
-    DLOG(INFO) << "Send request received for pipe " << pipepath;
+    DLOG(INFO) << "Send request received for pipe " << pipename;
     std::stringstream ss;
     const int msg_size((*buffer)->size());
     ss << std::setfill('0') << std::setw(8) << std::hex << msg_size;
-    DLOG(INFO) << "Sending message size bytes over pipe " << pipepath << "...";
+    DLOG(INFO) << "Sending message size bytes over pipe " << pipename << "...";
     retcode = write(pipe_fd, ss.str().c_str(), 8);
     if (retcode == -1) {
-      LOG(ERROR) << "Failed to send message size bytes over pipe " << pipepath
+      LOG(ERROR) << "Failed to send message size bytes over pipe " << pipename
                  << ", " << errno;
       statuscode = errno;
       msg_ready = false;
       lk.unlock();
       continue;
     }
-    DLOG(INFO) << "Sending message bytes over pipe " << pipepath << "...";
+    DLOG(INFO) << "Sending message bytes over pipe " << pipename << "...";
     ;
     int total_bytes_written(0);
     while ((bytes_written = write(
@@ -91,7 +92,7 @@ void cppiper::Sender::sender(const std::filesystem::path pipepath,
            (msg_size - (total_bytes_written += bytes_written) > 0))
       ;
     if (bytes_written == -1) {
-      LOG(ERROR) << "Failed to send message bytes over pipe " << pipepath
+      LOG(ERROR) << "Failed to send message bytes over pipe " << pipename
                  << ", " << errno;
       statuscode = errno;
       msg_ready = false;
@@ -102,11 +103,11 @@ void cppiper::Sender::sender(const std::filesystem::path pipepath,
   }
   retcode = close(pipe_fd);
   if (retcode == -1) {
-    LOG(ERROR) << "Failed to close sender end for pipe " << pipepath << ", "
+    LOG(ERROR) << "Failed to close sender end for pipe " << pipename << ", "
                << errno;
     statuscode = 6;
   } else
-    DLOG(INFO) << "Closed sender end for pipe " << pipepath;
+    DLOG(INFO) << "Closed sender end for pipe " << pipename;
   lk.unlock();
 }
 
@@ -117,7 +118,7 @@ cppiper::Sender::Sender(const std::string name, const std::filesystem::path pipe
              std::ref(msg_ready), std::ref(stop), std::ref(lock),
              std::ref(msg_conditional)) {
   LOG(INFO) << "Constructed sender instance " << name << " with pipe "
-            << this->pipepath;
+            << this->pipepath.filename();
 }
 
 int cppiper::Sender::get_status_code(void) const { return statuscode; };
