@@ -25,8 +25,8 @@ void cppiper::Sender::sender(const std::filesystem::path pipepath,
                              bool &msg_ready, const bool &stop,
                              std::mutex &lock,
                              std::condition_variable &msg_conditional) {
-  const std::string & pipename(pipepath.filename());
   std::unique_lock lk(lock);
+  const std::string & pipename(pipepath.filename());
   DLOG(INFO) << "Initialising sender thread for pipe " << pipename;
   int retcode;
   if (not std::filesystem::exists(pipepath)) {
