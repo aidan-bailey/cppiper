@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <tuple>
+#include <filesystem>
 
 namespace cppiper {
 
@@ -24,7 +25,7 @@ private:
   //! Pipe directory lock.
   std::mutex lock;
   //! Pipe directory path.
-  const std::string pipedir;
+  const std::filesystem::path pipedir;
 
 public:
   //! Deleted.
@@ -35,7 +36,7 @@ public:
     \param pipedir a directory path for the pipes (this directory will be
     created if it does not exist).
    */
-  PipeManager(std::string pipedir);
+  PipeManager(const std::filesystem::path pipedir);
 
   //! Make a new fifo pipe with a random name.
   /*!
@@ -48,7 +49,7 @@ public:
     \param pipepath path to the pipe.
     \return whether or not the removal was successful.
   */
-  bool remove_pipe(std::string pipepath);
+  bool remove_pipe(const std::filesystem::path pipepath);
 
   //! Clear the pipe directory of pipes.
   void clear(void);

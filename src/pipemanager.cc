@@ -15,7 +15,7 @@ std::string cppiper::random_hex(int len) {
   return ss.str();
 }
 
-cppiper::PipeManager::PipeManager(std::string pipedir)
+cppiper::PipeManager::PipeManager(const std::filesystem::path pipedir)
     : lock(), pipedir(pipedir) {
   if (not std::filesystem::exists(pipedir)) {
     DLOG(INFO) << "Creating pipe directory " << pipedir << "...";
@@ -35,7 +35,7 @@ std::string cppiper::PipeManager::make_pipe(void) {
   return pipepath;
 }
 
-bool cppiper::PipeManager::remove_pipe(std::string pipepath) {
+bool cppiper::PipeManager::remove_pipe(const std::filesystem::path pipepath) {
   std::lock_guard lk(lock);
   if (not std::filesystem::exists(pipepath)) {
     LOG(WARNING) << "Failed to remove pipe at " << pipepath
