@@ -8,6 +8,7 @@
 #include <thread>
 #include <tuple>
 #include <vector>
+#include <filesystem>
 
 namespace cppiper {
 
@@ -17,7 +18,7 @@ private:
   //! Identifying name of this receiver instance (for debugging).
   const std::string name;
   //! Path to the receiver pipe.
-  const std::string pipepath;
+  const std::filesystem::path pipepath;
   //! Flag used to signal message is ready to be received.
   bool msg_ready;
   //! Code representing current status of receiver thread.
@@ -40,7 +41,7 @@ private:
     \param queue_lock reference to queue conditional lock.
     \param queue_condition reference to queue conditional.
    */
-  static void receiver(const std::string pipepath, bool &msg_ready,
+  static void receiver(const std::filesystem::path pipepath, bool &msg_ready,
                              int &statuscode,
                              std::queue<std::string> &msg_queue,
                              std::mutex &queue_lock,
@@ -55,7 +56,7 @@ public:
     \param name identifying name of this receiver instance (for debugging).
     \param pipepath path to the receiver pipe.
    */
-  Receiver(const std::string name, const std::string pipepath);
+  Receiver(const std::string name, const std::filesystem::path pipepath);
 
   //! Receive a message.
   /*!
@@ -74,7 +75,7 @@ public:
   /*!
     \return Pipe path.
    */
-  std::string get_pipe(void) const;
+  std::filesystem::path get_pipe(void) const;
 
 };
 

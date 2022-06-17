@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <vector>
 
-void cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
+void cppiper::Receiver::receiver(const std::filesystem::path pipepath, bool &msg_ready,
                                  int &statuscode,
                                  std::queue<std::string> &msg_queue,
                                  std::mutex &queue_lock,
@@ -96,7 +96,7 @@ void cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
   queue_condition.notify_one();
 }
 
-cppiper::Receiver::Receiver(const std::string name, const std::string pipepath)
+cppiper::Receiver::Receiver(const std::string name, const std::filesystem::path pipepath)
     : name(name), pipepath(pipepath), msg_ready(false), statuscode(0),
       msg_queue(), queue_lock(), queue_condition(),
       thread(receiver, pipepath, std::ref(msg_ready), std::ref(statuscode),
@@ -136,4 +136,4 @@ bool cppiper::Receiver::wait(void) {
   return true;
 }
 
-std::string cppiper::Receiver::get_pipe(void) const { return pipepath; }
+std::filesystem::path cppiper::Receiver::get_pipe(void) const { return pipepath; }
