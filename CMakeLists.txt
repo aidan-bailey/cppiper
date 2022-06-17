@@ -37,7 +37,7 @@ find_package (glog REQUIRED)
 
 # Dynamic Lib
 add_library(cppiper SHARED src/pipemanager.cc  src/receiver.cc src/sender.cc)
-target_link_libraries(cppiper PRIVATE glog::glog)
+target_link_libraries(cppiper PUBLIC glog::glog)
 generate_export_header(cppiper)
 set_property(TARGET cppiper PROPERTY VERSION ${CPPIPER_VERSION})
 #set_property(TARGET cppiper PROPERTY SOVERSION 3)
@@ -49,7 +49,7 @@ set_property(TARGET cppiper PROPERTY VERSION ${CPPIPER_VERSION})
 
 # Static Lib
 add_library(cppiper_static STATIC src/pipemanager.cc  src/receiver.cc src/sender.cc)
-target_link_libraries(cppiper_static PRIVATE glog::glog)
+target_link_libraries(cppiper_static PUBLIC glog::glog)
 generate_export_header(cppiper_static)
 set_property(TARGET cppiper_static PROPERTY VERSION ${CPPIPER_VERSION})
 #set_property(TARGET cppiper_static PROPERTY SOVERSION 3)
@@ -135,7 +135,7 @@ target_include_directories(benchmark PUBLIC
                            "${PROJECT_BINARY_DIR}"
                            include
                            )
-target_link_libraries(benchmark PUBLIC cppiper_static)
+target_link_libraries(benchmark PUBLIC cppiper)
 
 ##################
 # DOC GENERATION #
