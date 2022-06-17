@@ -124,9 +124,8 @@ int cppiper::Sender::get_status_code(void) const { return statuscode; };
 bool cppiper::Sender::send(const std::string &msg) {
   LOG(INFO) << "Sending message on sender instance " << name;
   if (not thread.joinable() or stop) {
-    spdlog::error(
-        "Attempt to send message on non-running sender instance for '{}'",
-        name);
+    LOG(WARNING) << "Attempt to send message on non-running sender instance for " << name << ", "
+               << errno;
     return false;
   }
   {
