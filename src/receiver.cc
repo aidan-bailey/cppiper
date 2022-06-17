@@ -1,6 +1,6 @@
 #include "../include/receiver.hh"
-#include <fcntl.h>
 #include "cppiperconfig.hh"
+#include <fcntl.h>
 #include <filesystem>
 #include <fstream>
 #include <functional>
@@ -24,7 +24,7 @@ void cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
   DLOG(INFO) << "Opening receiver end of pipe " << pipepath << "...";
   const int pipe_fd = open(pipepath.c_str(), O_RDONLY);
   if (pipe_fd == -1) {
-    LOG(ERROR) << "Failed to open receiver pipe " << pipepath;
+    LOG(ERROR) << "Failed to open receiver pipe " << pipepath << ", " << errno;
     statuscode = 1;
     queue_lock.unlock();
     return;
@@ -37,7 +37,8 @@ void cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
     DLOG(INFO) << "Reading message size bytes from pipe " << pipepath << "...";
     bytes_read = read(pipe_fd, hexbuffer, 8);
     if (bytes_read == -1) {
-      LOG(ERROR) << "Failed to read size bytes from pipe " << pipepath;
+      LOG(ERROR) << "Failed to read size bytes from pipe " << pipepath << ", "
+                 << errno;
       statuscode = errno;
       continue;
     } else if (bytes_read == 0) {
@@ -45,7 +46,7 @@ void cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
       break;
     } else if (bytes_read != 8) {
       LOG(ERROR) << "Read an unexpected number of message size bytes from pipe "
-                 << pipepath;
+                 << pipepath << ", " << errno;
       statuscode = errno;
       break;
     }
@@ -57,7 +58,7 @@ void cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
     ss >> msg_size;
     if (msg_size < 1) {
       LOG(ERROR) << "Parsed message size less than 1 (" << msg_size
-                 << ") from pipe " << pipepath;
+                 << ") from pipe " << pipepath << ", " << errno;
       statuscode = errno;
       continue;
     }
@@ -70,7 +71,8 @@ void cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
            (msg_size - (total_bytes_read += bytes_read) > 0))
       ;
     if (bytes_read == -1) {
-      LOG(ERROR) << "Failed to read message bytes from pipe " << pipepath;
+      LOG(ERROR) << "Failed to read message bytes from pipe " << pipepath
+                 << ", " << errno;
       statuscode = errno;
       continue;
     } else if (bytes_read == 0) {
@@ -84,7 +86,8 @@ void cppiper::Receiver::receiver(const std::string pipepath, bool &msg_ready,
   }
   retcode = close(pipe_fd);
   if (retcode == -1) {
-    LOG(ERROR) << "Failed to close receiver end for pipe " << pipepath;
+    LOG(ERROR) << "Failed to close receiver end for pipe " << pipepath << ", "
+               << errno;
     statuscode = errno;
   } else {
     DLOG(INFO) << "Closed receiver end for pipe " << pipepath;
