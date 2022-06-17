@@ -40,18 +40,26 @@ public:
    */
   PipeManager(const std::filesystem::path pipedir);
 
-  //! Make a new fifo pipe with a random name.
+  //! Make a new fifo pipe with a random name (of cppiper::PIPE_LENGTH length).
   /*!
     \return The path to the pipe.
   */
   std::filesystem::path make_pipe(void);
+
+  //! Make a new fifo pipe with a random name (of cppiper::PIPE_LENGTH length).
+  /*!
+    \param pipename name for the new pipe.
+    \return The path to the pipe.
+    \throw filesystem_error if the pipe already exists.
+  */
+  std::filesystem::path make_pipe(const std::string& pipename);
 
   //! Remove a pipe from the pipe directory.
   /*!
     \param pipename name of pipe.
     \return whether or not the removal was successful.
   */
-  bool remove_pipe(const std::string pipename);
+  bool remove_pipe(const std::string& pipename);
 
   //! Clear the pipe directory of pipes.
   void clear(void);

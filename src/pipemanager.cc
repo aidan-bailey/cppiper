@@ -37,7 +37,20 @@ std::filesystem::path cppiper::PipeManager::make_pipe(void) {
   return pipepath;
 }
 
-bool cppiper::PipeManager::remove_pipe(const std::string pipename) {
+std::filesystem::path cppiper::PipeManager::make_pipe(const std::string& pipename) {
+  std::lock_guard lk(lock);
+  std::filesystem::path pipepath(pipedir.string() + std::filesystem::path::preferred_separator + pipename);
+  if (std::filesystem::exists(pipepath))
+  {
+    const std::string errmsg("Attempt to make pipe " + pipepath.string() + " that already exists");
+    LOG(ERROR) << pipepath.string();
+    throw std::filesystem::filesystem_error(errmsg, std::make_error_code(std::errc::file_exists));
+  }
+  DLOG(INFO) << "New pipe created at " << pipepath;
+  return pipepath;
+}
+
+bool cppiper::PipeManager::remove_pipe(const std::string& pipename) {
   std::lock_guard lk(lock);
   const std::filesystem::path pipepath(pipedir.string() + std::filesystem::path::preferred_separator + pipename);
   if (not std::filesystem::exists(pipepath)) {
