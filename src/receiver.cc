@@ -19,7 +19,7 @@ void cppiper::Receiver::receiver(const std::filesystem::path pipepath, bool &msg
                                  std::queue<std::string> &msg_queue,
                                  std::mutex &queue_lock,
                                  std::condition_variable &queue_condition) {
-  const std::string & pipename = pipepath.filename();
+  const std::string & pipename(pipepath.filename());
   DLOG(INFO) << "Initialising receiver thread for pipe " << pipename;
   int retcode;
   DLOG(INFO) << "Opening receiver end of pipe " << pipename << "...";
