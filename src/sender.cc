@@ -31,14 +31,15 @@ void cppiper::Sender::sender(const std::string pipepath,
     DLOG(INFO) << "Pipe " << pipepath << " does not exist, creating...";
     retcode = mkfifo(pipepath.c_str(), 00666);
     if (retcode == -1) {
-      LOG(ERROR) << "Failed to open sender pipe " << pipepath;
+      LOG(ERROR) << "Failed to open sender pipe " << pipepath << ", " << errno;
       statuscode = errno;
       lk.unlock();
       return;
     }
   } else if (not std::filesystem::is_fifo(pipepath)) {
     LOG(ERROR) << "File at provided sender path " << pipepath
-               << " is not a fifo pipe";
+               << " is not a fifo pipe"
+               << ", " << errno;
     statuscode = 95;
     lk.unlock();
     return;
@@ -46,7 +47,7 @@ void cppiper::Sender::sender(const std::string pipepath,
   DLOG(INFO) << "Opening sender end of pipe " << pipepath << "...";
   const int pipe_fd = open(pipepath.c_str(), O_WRONLY | O_APPEND);
   if (pipe_fd == -1) {
-    LOG(ERROR) << "Failed to open sender pipe " << pipepath;
+    LOG(ERROR) << "Failed to open sender pipe " << pipepath << ", " << errno;
     statuscode = errno;
     lk.unlock();
     return;
@@ -72,7 +73,8 @@ void cppiper::Sender::sender(const std::string pipepath,
     DLOG(INFO) << "Sending message size bytes over pipe " << pipepath << "...";
     retcode = write(pipe_fd, ss.str().c_str(), 8);
     if (retcode == -1) {
-      LOG(ERROR) << "Failed to send message size bytes over pipe " << pipepath;
+      LOG(ERROR) << "Failed to send message size bytes over pipe " << pipepath
+                 << ", " << errno;
       statuscode = errno;
       msg_ready = false;
       lk.unlock();
@@ -88,7 +90,8 @@ void cppiper::Sender::sender(const std::string pipepath,
            (msg_size - (total_bytes_written += bytes_written) > 0))
       ;
     if (bytes_written == -1) {
-      LOG(ERROR) << "Failed to send message bytes over pipe " << pipepath;
+      LOG(ERROR) << "Failed to send message bytes over pipe " << pipepath
+                 << ", " << errno;
       statuscode = errno;
       msg_ready = false;
       lk.unlock();
@@ -98,7 +101,8 @@ void cppiper::Sender::sender(const std::string pipepath,
   }
   retcode = close(pipe_fd);
   if (retcode == -1) {
-    LOG(ERROR) << "Failed to close sender end for pipe " << pipepath;
+    LOG(ERROR) << "Failed to close sender end for pipe " << pipepath << ", "
+               << errno;
     statuscode = 6;
   } else
     DLOG(INFO) << "Closed sender end for pipe " << pipepath;
@@ -137,7 +141,8 @@ bool cppiper::Sender::send(const std::string &msg) {
   if (statuscode == 0)
     LOG(INFO) << "Message sent on sender instance " << name;
   else
-    LOG(ERROR) << "Message failed to send on sender instance " << name;
+    LOG(ERROR) << "Message failed to send on sender instance " << name << ", "
+               << errno;
   return statuscode == 0;
 }
 
