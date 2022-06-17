@@ -104,7 +104,7 @@ cppiper::Receiver::Receiver(const std::string name, const std::filesystem::path 
              std::ref(msg_queue), std::ref(queue_lock),
              std::ref(queue_condition)) {
   LOG(INFO) << "Constructed receiver instance " << name << " with pipe "
-            << pipepath.filename();
+            << this->pipepath.filename();
 }
 
 std::optional<const std::string> cppiper::Receiver::receive(bool wait) {
