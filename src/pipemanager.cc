@@ -1,6 +1,6 @@
 #include "../include/pipemanager.hh"
-#include <filesystem>
 #include "cppiperconfig.hh"
+#include <filesystem>
 #include <glog/logging.h>
 #include <mutex>
 #include <string>
@@ -50,7 +50,8 @@ bool cppiper::PipeManager::remove_pipe(std::string pipepath) {
 void cppiper::PipeManager::clear(void) {
   DLOG(INFO) << "Clearing pipes...";
   if (not std::filesystem::exists(pipedir)) {
-    LOG(ERROR) << "Attempt to clear non-existent pipe directory " << pipedir;
+    LOG(ERROR) << "Attempt to clear non-existent pipe directory " << pipedir
+               << ", " << errno;
   } else {
     for (const auto &entry : std::filesystem::directory_iterator(pipedir)) {
       std::filesystem::remove(entry.path());
