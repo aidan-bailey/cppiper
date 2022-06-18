@@ -14,11 +14,7 @@
 #include <unistd.h>
 #include <vector>
 
-void cppiper::Receiver::receiver(const std::filesystem::path pipepath, bool &msg_ready,
-                                 int &statuscode,
-                                 std::queue<std::string> &msg_queue,
-                                 std::mutex &queue_lock,
-                                 std::condition_variable &queue_condition) {
+void cppiper::Receiver::run() {
   const std::string & pipename(pipepath.filename());
   DLOG(INFO) << "Initialising receiver thread for pipe " << pipename;
   int retcode;
@@ -68,11 +64,11 @@ void cppiper::Receiver::receiver(const std::filesystem::path pipepath, bool &msg
       statuscode = errno;
       continue;
     }
-    std::vector<char> subbuffer(msg_size);
+    char subbuffer[msg_size];
     DLOG(INFO) << "Reading message bytes from pipe " << pipename << "...";
     total_bytes_read = 0;
     while ((bytes_read = read(
-                pipe_fd, &subbuffer.front() + total_bytes_read,
+                pipe_fd, subbuffer + total_bytes_read,
                 std::min(msg_size - total_bytes_read, buffering_limit))) > 0 and
            (msg_size - (total_bytes_read += bytes_read) > 0))
       ;
@@ -85,7 +81,7 @@ void cppiper::Receiver::receiver(const std::filesystem::path pipepath, bool &msg
       DLOG(INFO) << "Breaking from receiver loop for pipe " << pipename;
       break;
     }
-    msg_queue.emplace(std::string(&subbuffer.front(), msg_size));
+    msg_queue.emplace(std::string(subbuffer, msg_size));
     msg_ready = true;
     queue_lock.unlock();
     queue_condition.notify_one();
@@ -104,10 +100,8 @@ void cppiper::Receiver::receiver(const std::filesystem::path pipepath, bool &msg
 
 cppiper::Receiver::Receiver(const std::string name, const std::filesystem::path pipepath)
     : name(name), pipepath(pipepath), msg_ready(false), statuscode(0),
-      msg_queue(), queue_lock(), queue_condition(),
-      thread(receiver, pipepath, std::ref(msg_ready), std::ref(statuscode),
-             std::ref(msg_queue), std::ref(queue_lock),
-             std::ref(queue_condition)) {
+      msg_queue{}, queue_lock{}, queue_condition{} {
+  thread = std::thread(&Receiver::run, this);
   LOG(INFO) << "Constructed receiver instance " << name << " with pipe "
             << this->pipepath.filename();
 }

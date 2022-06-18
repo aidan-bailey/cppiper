@@ -19,8 +19,12 @@ private:
   const std::filesystem::path pipepath;
   //! Message buffer.
   const std::string *buffer;
+  //! How much to write
+  const int buffering_limit;
   //! Code representing current status of sender thread.
   int statuscode;
+  //! Sender pipe file descriptor
+  int pipe_fd;
   //! Flag used to signal message is ready to be sent.
   bool msg_ready;
   //! Flag used to stop thread.
@@ -32,20 +36,8 @@ private:
   //! Sender thread.
   std::thread thread;
 
-  //! Static method to be executed in the sender thread.
-  /*!
-   \param pipepath path to the sender pipe.
-   \param buffer reference to message buffer.
-   \param statuscode reference to status code.
-   \param msg_ready reference to message ready signal bool.
-   \param stop reference to stop signal bool.
-   \param lock reference to conditional lock.
-   \param msg_conditional reference to conditional.
-   */
-  static void sender(const std::filesystem::path pipepath, const std::string **buffer,
-                           int &statuscode, bool &msg_ready, const bool &stop,
-                           std::mutex &lock,
-                           std::condition_variable &msg_conditional);
+  //! Sender thread run method.
+  void run();
 
 public:
   //! Deleted.

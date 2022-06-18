@@ -32,20 +32,8 @@ private:
   //! Sender thread.
   std::thread thread;
 
-  //! Static method to be executed in the receiver thread.
-  /*!
-    \param pipepath path to the receiver pipe.
-    \param msg_ready reference to message ready signal bool.
-    \param statuscode reference to status code.
-    \param msg_queue reference to message queue.
-    \param queue_lock reference to queue conditional lock.
-    \param queue_condition reference to queue conditional.
-   */
-  static void receiver(const std::filesystem::path pipepath, bool &msg_ready,
-                             int &statuscode,
-                             std::queue<std::string> &msg_queue,
-                             std::mutex &queue_lock,
-                             std::condition_variable &queue_condition);
+  //! Receiver thread run method.
+  void run();
 
 public:
   //! Deleted.

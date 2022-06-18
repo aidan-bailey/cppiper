@@ -16,18 +16,68 @@
 #include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <thread>
 #include <unistd.h>
 #include <vector>
-#include <filesystem>
 
-void cppiper::Sender::sender(const std::filesystem::path pipepath,
-                             const std::string **buffer, int &statuscode,
-                             bool &msg_ready, const bool &stop,
-                             std::mutex &lock,
-                             std::condition_variable &msg_conditional) {
-  std::unique_lock lk(lock);
-  const std::string & pipename(pipepath.filename());
-  DLOG(INFO) << "Initialising sender thread for pipe " << pipename;
+void cppiper::Sender::run() {
+  while (true) {
+    std::unique_lock lk(lock);
+    if (not(msg_ready or stop)) {
+      DLOG(INFO) << "Waiting on sender request for pipe " << pipepath.filename()
+                 << "...";
+      msg_conditional.notify_one();
+      msg_conditional.wait(lk, [&]() { return msg_ready or stop; });
+    }
+    statuscode = 0;
+    if (stop) {
+      DLOG(INFO) << "Breaking from sender loop for pipe "
+                 << pipepath.filename();
+      break;
+    }
+    DLOG(INFO) << "Send request received for pipe " << pipepath.filename();
+    std::stringstream ss;
+    const int msg_size(buffer->size());
+    ss << std::setfill('0') << std::setw(8) << std::hex << msg_size;
+    DLOG(INFO) << "Sending message size bytes over pipe " << pipepath.filename()
+               << "...";
+    if (write(pipe_fd, ss.str().c_str(), 8) < 0) {
+      LOG(ERROR) << "Failed to send message size bytes over pipe "
+                 << pipepath.filename() << ", " << errno;
+      statuscode = errno;
+      msg_ready = false;
+      lk.unlock();
+      continue;
+    }
+    DLOG(INFO) << "Sending message bytes over pipe " << pipepath.filename()
+               << "...";
+    int bytes_written(0);
+    int total_bytes_written(0);
+    while ((bytes_written = write(
+                pipe_fd, &buffer->front() + total_bytes_written,
+                std::min(msg_size - total_bytes_written, buffering_limit))) >
+               0 and
+           (msg_size - (total_bytes_written += bytes_written) > 0)) {
+      if (bytes_written < 0) {
+        LOG(ERROR) << "Failed to send message bytes over pipe "
+                   << pipepath.filename() << ", " << errno;
+        statuscode = errno;
+        msg_ready = false;
+        lk.unlock();
+        continue;
+      }
+    };
+    msg_ready = false;
+    lk.unlock();
+  }
+}
+
+cppiper::Sender::Sender(const std::string name,
+                        const std::filesystem::path pipepath)
+    : name(name), pipepath(std::filesystem::absolute(pipepath)),
+      buffer(nullptr), buffering_limit(65536), statuscode(0), pipe_fd(-1),
+      msg_ready(false), stop(false), lock{}, msg_conditional{} {
+  DLOG(INFO) << "Initialising sender thread for pipe " << pipepath.filename();
   int retcode;
   if (not std::filesystem::exists(pipepath)) {
     DLOG(INFO) << "Pipe " << pipepath << " does not exist, creating...";
@@ -35,7 +85,6 @@ void cppiper::Sender::sender(const std::filesystem::path pipepath,
     if (retcode == -1) {
       LOG(ERROR) << "Failed to open sender pipe " << pipepath << ", " << errno;
       statuscode = errno;
-      lk.unlock();
       return;
     }
   } else if (not std::filesystem::is_fifo(pipepath)) {
@@ -43,80 +92,18 @@ void cppiper::Sender::sender(const std::filesystem::path pipepath,
                << " is not a fifo pipe"
                << ", " << errno;
     statuscode = 95;
-    lk.unlock();
     return;
   }
   DLOG(INFO) << "Opening sender end of pipe " << pipepath << "...";
-  const int pipe_fd = open(pipepath.c_str(), O_WRONLY | O_APPEND);
+  pipe_fd = open(pipepath.c_str(), O_WRONLY | O_APPEND);
   if (pipe_fd == -1) {
     LOG(ERROR) << "Failed to open sender pipe " << pipepath << ", " << errno;
     statuscode = errno;
-    lk.unlock();
     return;
   }
-  DLOG(INFO) << "Entering sender loop for pipe " << pipename << "...";
-  int bytes_written;
-  const int buffering_limit(65536);
-  while (true) {
-    if (not(msg_ready or stop)) {
-      DLOG(INFO) << "Waiting on sender request for pipe " << pipename << "...";
-      msg_conditional.notify_one();
-      msg_conditional.wait(lk, [&]() { return msg_ready or stop; });
-    }
-    statuscode = 0;
-    if (stop) {
-      DLOG(INFO) << "Breaking from sender loop for pipe " << pipename;
-      break;
-    }
-    DLOG(INFO) << "Send request received for pipe " << pipename;
-    std::stringstream ss;
-    const int msg_size((*buffer)->size());
-    ss << std::setfill('0') << std::setw(8) << std::hex << msg_size;
-    DLOG(INFO) << "Sending message size bytes over pipe " << pipename << "...";
-    retcode = write(pipe_fd, ss.str().c_str(), 8);
-    if (retcode == -1) {
-      LOG(ERROR) << "Failed to send message size bytes over pipe " << pipename
-                 << ", " << errno;
-      statuscode = errno;
-      msg_ready = false;
-      lk.unlock();
-      continue;
-    }
-    DLOG(INFO) << "Sending message bytes over pipe " << pipename << "...";
-    ;
-    int total_bytes_written(0);
-    while ((bytes_written = write(
-                pipe_fd, &(*buffer)->front() + total_bytes_written,
-                std::min(msg_size - total_bytes_written, buffering_limit))) >
-               0 and
-           (msg_size - (total_bytes_written += bytes_written) > 0))
-      ;
-    if (bytes_written == -1) {
-      LOG(ERROR) << "Failed to send message bytes over pipe " << pipename
-                 << ", " << errno;
-      statuscode = errno;
-      msg_ready = false;
-      lk.unlock();
-      continue;
-    }
-    msg_ready = false;
-  }
-  retcode = close(pipe_fd);
-  if (retcode == -1) {
-    LOG(ERROR) << "Failed to close sender end for pipe " << pipename << ", "
-               << errno;
-    statuscode = 6;
-  } else
-    DLOG(INFO) << "Closed sender end for pipe " << pipename;
-  lk.unlock();
-}
-
-cppiper::Sender::Sender(const std::string name, const std::filesystem::path pipepath)
-    : name(name), pipepath(std::filesystem::absolute(pipepath)), buffer(nullptr), statuscode(0),
-      msg_ready(false), stop(false), lock(), msg_conditional(),
-      thread(sender, this->pipepath, &buffer, std::ref(statuscode),
-             std::ref(msg_ready), std::ref(stop), std::ref(lock),
-             std::ref(msg_conditional)) {
+  DLOG(INFO) << "Entering sender loop for pipe " << pipepath.filename()
+             << "...";
+  thread = std::thread(&Sender::run, this);
   LOG(INFO) << "Constructed sender instance " << name << " with pipe "
             << this->pipepath.filename();
 }
@@ -126,8 +113,9 @@ int cppiper::Sender::get_status_code(void) const { return statuscode; };
 bool cppiper::Sender::send(const std::string &msg) {
   LOG(INFO) << "Sending message on sender instance " << name;
   if (not thread.joinable() or stop) {
-    LOG(WARNING) << "Attempt to send message on non-running sender instance for " << name << ", "
-               << errno;
+    LOG(WARNING)
+        << "Attempt to send message on non-running sender instance for " << name
+        << ", " << errno;
     return false;
   }
   {
@@ -159,6 +147,12 @@ bool cppiper::Sender::terminate(void) {
   msg_conditional.notify_one();
   DLOG(INFO) << "Joining thread for sender instance " << name << "...";
   thread.join();
+  if (close(pipe_fd) < 0) {
+    LOG(ERROR) << "Failed to close sender end for pipe " << pipepath.filename()
+               << ", " << errno;
+    statuscode = 6;
+  } else
+    DLOG(INFO) << "Closed sender end for pipe " << pipepath.filename();
   DLOG(INFO) << "Joined thread for sender instance " << name;
   LOG(INFO) << "Terminated sender instance " << name;
   return true;
