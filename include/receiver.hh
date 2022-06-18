@@ -19,12 +19,16 @@ private:
   const std::string name;
   //! Path to the receiver pipe.
   const std::filesystem::path pipepath;
-  //! Receiver loop is running
+  //! Buffering limit.
+  const int buffering_limit;
+  //! Receiver loop is running.
   bool running;
   //! Flag used to signal message is ready to be received.
   bool msg_ready;
   //! Code representing current status of receiver thread.
   int statuscode;
+  //! Receiver pipe file descriptor.
+  int pipe_fd;
   //! Queue of received messages.
   std::queue<std::string> msg_queue;
   //! Queue lock for the queue conditional.
