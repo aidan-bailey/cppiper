@@ -19,6 +19,8 @@ private:
   const std::string name;
   //! Path to the receiver pipe.
   const std::filesystem::path pipepath;
+  //! Receiver loop is running
+  bool running;
   //! Flag used to signal message is ready to be received.
   bool msg_ready;
   //! Code representing current status of receiver thread.

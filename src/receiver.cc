@@ -29,6 +29,7 @@ void cppiper::Receiver::run() {
   int bytes_read;
   const int buffering_limit(65536);
   DLOG(INFO) << "Entering receiver loop for pipe " << pipename << "...";
+  running = true;
   while (true) {
     DLOG(INFO) << "Reading message size bytes from pipe " << pipename << "...";
     int total_bytes_read(0);
@@ -84,6 +85,7 @@ void cppiper::Receiver::run() {
     msg_ready = true;
     queue_condition.notify_one();
   }
+  running = false;
   retcode = close(pipe_fd);
   if (retcode == -1) {
     LOG(ERROR) << "Failed to close receiver end of pipe " << pipename << ", "
@@ -96,7 +98,7 @@ void cppiper::Receiver::run() {
 }
 
 cppiper::Receiver::Receiver(const std::string name, const std::filesystem::path pipepath)
-    : name(name), pipepath(pipepath), msg_ready(false), statuscode(0),
+    : name(name), pipepath(pipepath), running(false), msg_ready(false), statuscode(0),
       msg_queue{}, queue_lock{}, queue_condition{} {
   thread = std::thread(&Receiver::run, this);
   LOG(INFO) << "Constructed receiver instance " << name << " with pipe "
@@ -106,7 +108,7 @@ cppiper::Receiver::Receiver(const std::string name, const std::filesystem::path 
 std::optional<const std::string> cppiper::Receiver::receive(bool wait) {
   std::unique_lock lk(queue_lock);
   LOG(INFO) << "Trying to receive message on receiver instance " << name;
-  if (not msg_ready and wait) {
+  if (running and not msg_ready and wait) {
     DLOG(INFO) << "Waiting to receive message on receiver instance " << name;
     queue_condition.wait(lk, [this] { return msg_ready; });
   }
