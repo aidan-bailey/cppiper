@@ -65,16 +65,16 @@ void cppiper::Receiver::run() {
     }
     std::lock_guard lk(queue_lock);
     msg_queue.emplace(std::string(subbuffer, msg_size));
-    msg_ready = true;
     queue_condition.notify_one();
   }
+  std::lock_guard lk(queue_lock);
   running = false;
-  queue_condition.notify_one();
+  queue_condition.notify_all();
 }
 
 cppiper::Receiver::Receiver(const std::string name,
                             const std::filesystem::path pipepath)
-    : name(name), pipepath(pipepath), buffering_limit(65536), running(false), msg_ready(false),
+    : name(name), pipepath(pipepath), buffering_limit(65536), running(false),
       statuscode(0), pipe_fd(-1), msg_queue{}, queue_lock{}, queue_condition{} {
   DLOG(INFO) << "Initialising receiver thread for pipe " << pipepath.filename();
   DLOG(INFO) << "Opening receiver end of pipe " << pipepath.filename() << "...";
@@ -91,21 +91,19 @@ cppiper::Receiver::Receiver(const std::string name,
 
 std::optional<const std::string> cppiper::Receiver::receive(bool wait) {
   std::unique_lock lk(queue_lock);
-  LOG(INFO) << "Trying to receive message on receiver instance " << name;
-  if (running and not msg_ready and wait) {
-    DLOG(INFO) << "Waiting to receive message on receiver instance " << name;
-    queue_condition.wait(lk, [this] { return msg_ready; });
+  LOG(INFO) << "Retrieving message from receiver instance " << name;
+  if (msg_queue.empty() and running and wait) {
+    queue_condition.wait(lk, [this] { return not msg_queue.empty() or not running; });
   }
   if (msg_queue.empty()) {
+    LOG(INFO) << "No message to retrieve from receiver instance " << name;
     lk.unlock();
     return {};
   }
   const std::string msg = msg_queue.front();
   msg_queue.pop();
-  if (msg_queue.empty())
-    msg_ready = false;
   lk.unlock();
-  LOG(INFO) << "Returning received message from receiver instance " << name;
+  LOG(INFO) << "Retrieved message from receiver instance " << name;
   return msg;
 }
 

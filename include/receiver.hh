@@ -23,8 +23,6 @@ private:
   const int buffering_limit;
   //! Receiver loop is running.
   bool running;
-  //! Flag used to signal message is ready to be received.
-  bool msg_ready;
   //! Code representing current status of receiver thread.
   int statuscode;
   //! Receiver pipe file descriptor.
