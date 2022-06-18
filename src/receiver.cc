@@ -36,7 +36,12 @@ void cppiper::Receiver::receiver(const std::filesystem::path pipepath, bool &msg
   DLOG(INFO) << "Entering receiver loop for pipe " << pipename << "...";
   while (true) {
     DLOG(INFO) << "Reading message size bytes from pipe " << pipename << "...";
-    bytes_read = read(pipe_fd, hexbuffer, 8);
+    int total_bytes_read(0);
+    while ((bytes_read = read(
+                pipe_fd, hexbuffer + total_bytes_read,
+                std::min(8 - total_bytes_read, buffering_limit))) > 0 and
+           (8 - (total_bytes_read += bytes_read) > 0))
+      ;
     if (bytes_read == -1) {
       LOG(ERROR) << "Failed to read size bytes from pipe " << pipename << ", "
                  << errno;
@@ -65,7 +70,7 @@ void cppiper::Receiver::receiver(const std::filesystem::path pipepath, bool &msg
     }
     std::vector<char> subbuffer(msg_size);
     DLOG(INFO) << "Reading message bytes from pipe " << pipename << "...";
-    int total_bytes_read(0);
+    total_bytes_read = 0;
     while ((bytes_read = read(
                 pipe_fd, &subbuffer.front() + total_bytes_read,
                 std::min(msg_size - total_bytes_read, buffering_limit))) > 0 and
