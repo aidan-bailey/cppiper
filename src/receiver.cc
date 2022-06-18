@@ -23,7 +23,6 @@ void cppiper::Receiver::run() {
   if (pipe_fd == -1) {
     LOG(ERROR) << "Failed to open receiver pipe " << pipepath << ", " << errno;
     statuscode = 1;
-    queue_lock.unlock();
     return;
   }
   char hexbuffer[8];
@@ -52,7 +51,6 @@ void cppiper::Receiver::run() {
       statuscode = errno;
       break;
     }
-    queue_lock.lock();
     statuscode = 0;
     std::stringstream ss;
     ss << std::hex << hexbuffer;
@@ -81,9 +79,9 @@ void cppiper::Receiver::run() {
       DLOG(INFO) << "Breaking from receiver loop for pipe " << pipename;
       break;
     }
+    std::lock_guard lk(queue_lock);
     msg_queue.emplace(std::string(subbuffer, msg_size));
     msg_ready = true;
-    queue_lock.unlock();
     queue_condition.notify_one();
   }
   retcode = close(pipe_fd);
@@ -94,7 +92,6 @@ void cppiper::Receiver::run() {
   } else {
     DLOG(INFO) << "Closed receiver end of pipe " << pipename;
   }
-  queue_lock.unlock();
   queue_condition.notify_one();
 }
 
@@ -117,7 +114,7 @@ std::optional<const std::string> cppiper::Receiver::receive(bool wait) {
     lk.unlock();
     return {};
   }
-  std::string msg = msg_queue.front();
+  const std::string msg = msg_queue.front();
   msg_queue.pop();
   if (msg_queue.empty())
     msg_ready = false;
